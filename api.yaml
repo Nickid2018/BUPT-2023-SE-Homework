@@ -1,0 +1,12 @@
+openapi: 3.0.3
+
+info:
+  title: BUPT Software Engineering Homework API
+  description: BUPT Software Engineering Homework API
+  version: 1.0.0
+
+servers:
+  - url: 'http://localhost:11451'
+    description: Local server
+
+paths:
