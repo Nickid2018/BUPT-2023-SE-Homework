@@ -6,7 +6,95 @@ info:
   version: 1.0.0
 
 servers:
-  - url: 'http://localhost:11451'
+  - url: 'http://localhost:11451/api'
     description: Local server
 
+security:
+  - sessionAuth: [ ]
+
 paths:
+  /login:
+    post:
+      tags:
+        - Authorization
+      summary: Login as admin
+      parameters:
+        - in: query
+          name: no-csrf # If the server doesn't implement CSRF token, add this parameter to disable CSRF token
+          schema:
+            type: boolean
+          description: Disable CSRF token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: admin
+                password:
+                  type: string
+                  example: admin
+      responses:
+        '200':
+          description: Login successfully
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: session=abcde12345; Path=/
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    example: admin
+                  csrf_token: # Optional: anti-CSRF token
+                    type: string
+                    example: abcde12345
+        '401':
+          description: Login failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+  /logout:
+    post:
+      tags:
+        - Authorization
+      security:
+        - sessionAuth: [ ]
+      summary: Logout
+      responses:
+        '204':
+          description: Logout successfully
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: session=; Path=/
+        '401':
+          description: Not logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+
+
+components:
+  securitySchemes:
+    sessionAuth:
+      type: apiKey
+      in: cookie # Optional: use CSRF token, header = X-CSRF-Token
+      name: session
+  schemas:
+    error_response:
+      type: object
+      properties:
+        error_code:
+          type: integer
+          example: 100
