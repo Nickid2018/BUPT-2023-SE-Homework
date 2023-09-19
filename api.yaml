@@ -271,6 +271,12 @@ paths:
                   wind_speed:
                     type: integer
                     example: 3
+                  mode:
+                    type: string
+                    example: cold
+                  sweep:
+                    type: boolean
+                    example: true
                   is_on:
                     type: boolean
                     example: true
@@ -424,7 +430,9 @@ components:
           example: 2-233
         operation:
           type: string
-          example: start_26_3 # start_<temperature_number>_<wind_speed_number>, stop, temperature_<number>, wind_speed_<number>
+          example: start_26_3
+          # start_<temperature_number>_<wind_speed_number>_<mode>_<sweep>, stop,
+          # temperature_<number>, wind_speed_<number>, mode_<mode>, sweep_<on/off>
         time:
           type: string
           example: 2023-09-18T11:45:14+08:00 # ISO 8601
@@ -461,6 +469,12 @@ components:
                 wind_speed:
                   type: integer
                   example: 3
+                mode:
+                  type: string
+                  example: cold
+                sweep:
+                  type: boolean
+                  example: true
                 duration:
                   type: integer
                   example: 86400 # seconds
