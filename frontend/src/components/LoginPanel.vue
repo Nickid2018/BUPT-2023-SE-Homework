@@ -17,10 +17,7 @@ function loginNow() {
   login(username.value, password.value, (data) => {
     emit('login', data.username);
     emit('close');
-  }, errorCode => {
-    errorMessage.value = ERROR_CODE_MAP[errorCode];
-    console.log(errorCode)
-  });
+  }, errorCode => errorMessage.value = ERROR_CODE_MAP[errorCode]);
 }
 </script>
 

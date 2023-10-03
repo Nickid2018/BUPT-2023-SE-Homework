@@ -37,7 +37,7 @@ export function login(username: string, password: string,
 }
 
 // Error Codes --------------------------------------------------
-export const ERROR_CODE_MAP = {
+export const ERROR_CODE_MAP: { [errorCode: number]: string } = {
   0x7fffffff: "无法连接到服务器，请稍后再试！",
   1073742228: "无法访问服务器API，请稍后再试！" // 0x40000000 + 404
 };
