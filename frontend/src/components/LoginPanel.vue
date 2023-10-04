@@ -1,12 +1,20 @@
 <script setup lang="ts">
-import {ESCAPE, LOGIN, PASSWORD, USERNAME} from "../shared-constants.ts";
-import {ERROR_CODE_MAP, login} from "../utils/protocol.ts";
+import {
+  ESCAPE,
+  LOGIN,
+  PASSWORD,
+  PASSWORD_CANNOT_BE_EMPTY,
+  USERNAME,
+  USERNAME_CANNOT_BE_EMPTY
+} from "../shared-constants.ts";
+
+import {login, ERROR_CODE_MAP, UNKNOWN_ERROR} from "../utils/protocol.ts";
 import InputField from "./InputField.vue";
 import {ref} from "vue";
 
 const emit = defineEmits<{
   (event: 'close'): void,
-  (event: 'login', loginName: string): void
+  (event: 'login', loginName: string, csrfToken: string): void
 }>()
 
 const username = ref("");
@@ -14,10 +22,18 @@ const password = ref("");
 const errorMessage = ref("");
 
 function loginNow() {
+  if (username.value === "") {
+    errorMessage.value = USERNAME_CANNOT_BE_EMPTY;
+    return;
+  }
+  if (password.value === "") {
+    errorMessage.value = PASSWORD_CANNOT_BE_EMPTY;
+    return;
+  }
   login(username.value, password.value, (data) => {
-    emit('login', data.username);
+    emit('login', data.username, data.csrfToken);
     emit('close');
-  }, errorCode => errorMessage.value = ERROR_CODE_MAP[errorCode]);
+  }, errorCode => errorMessage.value = ERROR_CODE_MAP[errorCode] ?? UNKNOWN_ERROR);
 }
 </script>
 
