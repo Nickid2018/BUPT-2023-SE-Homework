@@ -2,7 +2,6 @@
 
 // Display Texts ----------------------------------------------
 export const SYSTEM_NAME = "温控管理系统";
-export const UNLOGIN = "未登录";
 export const LOGIN = "登录";
 export const USERNAME = "用户名";
 export const PASSWORD = "密码";

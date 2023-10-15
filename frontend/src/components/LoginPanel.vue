@@ -44,12 +44,12 @@ function loginNow() {
         {{ LOGIN }}
       </div>
       <div class="flex-none flex flex-col items-end">
-        <div class="flex-1 my-2">
+        <div class="flex-1 my-3">
           <label class="mr-3" for="username">{{ USERNAME }}</label>
           <InputField font-size="1em" line-height="2em" :error="errorMessage !== ''" id="username"
                       @value-change="value => username = value" @focus-in="errorMessage = ''"/>
         </div>
-        <div class="flex-1 my-2">
+        <div class="flex-1 my-3">
           <label class="mr-3" for="password">{{ PASSWORD }}</label>
           <InputField font-size="1em" line-height="2em" :password=true :error="errorMessage !== ''" id="password"
                       @value-change="value => password = value" @focus-in="errorMessage = ''"/>
@@ -59,10 +59,10 @@ function loginNow() {
         </div>
       </div>
       <div class="flex-none flex items-center gap-10 mt-2 px-10 py-2 w-full">
-        <button class="flex-1 bg-primary-500 rounded-md py-2" @click="loginNow">
+        <button class="flex-1 bg-primary-700 text-neutral-50 rounded-md py-2" @click="loginNow">
           {{ LOGIN }}
         </button>
-        <button class="flex-1 bg-primary-500 rounded-md py-2" @click="$emit('close')">
+        <button class="flex-1 bg-primary-700 text-neutral-50 rounded-md py-2" @click="$emit('close')">
           {{ ESCAPE }}
         </button>
       </div>
