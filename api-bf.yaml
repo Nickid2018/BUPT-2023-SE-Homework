@@ -1,8 +1,8 @@
 openapi: 3.0.3
 
 info:
-  title: BUPT Software Engineering Homework API
-  description: BUPT Software Engineering Homework API
+  title: BUPT Software Engineering Homework Server-Frontend API
+  description: BUPT Software Engineering Homework Server-Frontend API
   version: 1.0.0
 
 servers:
@@ -86,36 +86,6 @@ paths:
                 example: session=; Path=/
         '401':
           description: Not logged in
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-
-  /record:
-    post:
-      tags:
-        - Data Collect
-      summary: Record data
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                - $ref: '#/components/schemas/record_entry'
-      responses:
-        '200':
-          description: Record successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  unique_id:
-                    type: string
-                    example: 1145141919810abc # random Unique ID, 16 characters, same as the input
-        '403':
-          description: Signature not match
           content:
             application/json:
               schema:
@@ -232,6 +202,48 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
+  /admin/device/{room_id}:
+    post:
+      tags:
+        - Administrate
+      summary: Control device
+      security:
+        - sessionAuth: [ ]
+      parameters:
+        - in: path
+          name: room_id
+          schema:
+            type: string
+            example: 2-233
+          required: true
+          description: Room ID
+        - in: header
+          name: X-CSRF-Token
+          schema:
+            type: string
+            example: abcde12345 # Optional: anti-CSRF token
+          description: CSRF token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/request_entry'
+      responses:
+        '200':
+          description: Control successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: 2-233
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
 
   /status/{room_id}:
     get:
@@ -265,24 +277,31 @@ paths:
                   room:
                     type: string
                     example: 2-233
+                    required: true
                   temperature:
                     type: integer
                     example: 26
+                    required: true
                   wind_speed:
                     type: integer
                     example: 3
+                    required: true
                   mode:
                     type: string
                     example: cold
+                    required: true
                   sweep:
                     type: boolean
                     example: true
+                    required: true
                   is_on:
                     type: boolean
                     example: true
+                    required: true
                   last_update:
                     type: string
                     example: 2023-09-18T11:45:14+08:00 # ISO 8601
+                    required: true
         '401':
           description: Unauthorized
           content:
@@ -349,6 +368,7 @@ paths:
                 room:
                   type: string
                   example: 2-233
+                  required: true
       responses:
         '200':
           description: Check-in successfully
@@ -360,6 +380,7 @@ paths:
                   room:
                     type: string
                     example: 2-233 # same as the input
+                    required: true
         '401':
           description: Unauthorized
           content:
@@ -389,6 +410,7 @@ paths:
                 room:
                   type: string
                   example: 2-233
+                  required: true
       responses:
         '200':
           description: Check-out successfully
@@ -400,6 +422,7 @@ paths:
                   room:
                     type: string
                     example: 2-233 # same as the input
+                    required: true
                   report:
                     $ref: '#/components/schemas/report_data'
         '401':
@@ -422,27 +445,19 @@ components:
         error_code:
           type: integer
           example: 100
-    record_entry:
+    request_entry:
       type: object
       properties:
-        room:
-          type: string
-          example: 2-233
         operation:
           type: string
-          example: start_26_3
-          # start_<temperature_number>_<wind_speed_number>_<mode>_<sweep>, stop,
-          # temperature_<number>, wind_speed_<number>, mode_<mode>, sweep_<on/off>
-        time:
+          example: start
+          # start, stop, temperature, wind_speed, mode, sweep
+          required: true
+        data:
           type: string
-          example: 2023-09-18T11:45:14+08:00 # ISO 8601
-        unique_id:
-          type: string
-          example: 1145141919810abc # random Unique ID, 16 characters
-        signature:
-          type: string
-          example: RTMiQudovtn1Vz8FTVr7LBRocgd94twScB8u1AvaYAsS7kskXmHFs1KvHF9vsslS0uV3gfdyJFrH1HBj/kKzf2Z/y3XPJFMs90uqqN1JHDOwvTytxC2Dl8rL53LHD/fcbVsJa/I28AcxYXBiz79t/WYLhEIUBMrDjCXXYIZLvaQgEonsA4/Zb5kT5R1TRRgrAu9jHbqQU1dwPp0T6tUSZBVboJ8wSokRuUDCbWAQSW34pu3r+DVSNsWpZ5rN4xah/xo2J6A4UhNwvbqwoefbjfwO6xwjLyzN5VVZFzPUbgAF8ttn7uWfXJFhjhkRmPPCd5g3F5p74MCCdwdmCcA0MXjAmajtCj7KBw8x4WZ6Emb8t7z8uFqHdzh9ZLYFk4DBlkkTdUlHgwG40om29XbqCQgsUipXB9+v+c6q00oNukRQYthCARaaSIFwCxGPeAuAl+YJy5Y5fHBLnWYOF4faEFiueM0pK+NjRqmKn9LwYrOsSmENwNm959sK9Kb2qljCWIurTjjHvcxEriMMfJsZARXD7a1Ms7cGV0ABHQIhvIdOmtjKE+qWvF6kbbeZ5+nikNP+tJufnlFE3vU03oSQGPPnYdUz6juvQIKHXb5xe8j1VrnsYyZTD/5HhblhydTGZxzYUdmFjk/rs2BrMscEZPAzgBgANJw/k2FD/70CxLg=
-          # SHA256withRSA, RSA 4096, sign text = room + operation + time + unique_id
+          example: 26
+          # different for operations
+          required: true
     report_data:
       type: object
       properties:
@@ -460,24 +475,32 @@ components:
                 start_time:
                   type: string
                   example: 2023-09-18T11:45:14+08:00 # ISO 8601
+                  required: true
                 end_time:
                   type: string
                   example: 2023-09-19T11:45:14+08:00 # ISO 8601
+                  required: true
                 temperature:
                   type: integer
                   example: 26
+                  required: true
                 wind_speed:
                   type: integer
                   example: 3
+                  required: true
                 mode:
                   type: string
                   example: cold
+                  required: true
                 sweep:
                   type: boolean
                   example: true
+                  required: true
                 duration:
                   type: integer
                   example: 86400 # seconds
+                  required: true
                 cost:
                   type: integer
                   example: 114514
+                  required: true
