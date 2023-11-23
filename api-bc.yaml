@@ -7,7 +7,16 @@ info:
 
 servers:
   - url: 'http://localhost:11451/api'
-    description: Local server
+    description: Local Server
+  - url: 'http://{ip}:{port}/api'
+    description: Client WebHook
+    variables:
+      ip:
+        default: localhost
+        description: Client IP
+      port:
+        default: '11451'
+        description: Client WebHook port
 
 paths:
   /device/client:
