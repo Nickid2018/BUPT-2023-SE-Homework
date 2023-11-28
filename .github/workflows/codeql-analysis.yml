@@ -13,11 +13,6 @@ jobs:
       contents: read
       security-events: write
 
-    strategy:
-      fail-fast: false
-      matrix:
-        project: [ 'backend', 'client', 'frontend' ]
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -29,10 +24,6 @@ jobs:
         uses: github/codeql-action/init@v2
         with:
           languages: python, javascript-typescript
-          config: |
-            paths:
-              - ${{ matrix.project }}
-      
 
       # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
       # If this step fails, then you should remove it and run the build manually (see below)
