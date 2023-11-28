@@ -5,6 +5,7 @@ from ac_controller import ACController
 from database_manager import DatabaseManager
 from network_manager import NetworkManager
 
+
 def main():
     # 创建应用程序实例
     app = QApplication(sys.argv)
@@ -27,5 +28,6 @@ def main():
     # 运行应用程序
     sys.exit(app.exec_())
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

@@ -1,14 +1,16 @@
 from flask import Blueprint, request, jsonify
+
 # 引入数据库
 # from app.models import
 
-data_blueprint = Blueprint('data', __name__)
+data_blueprint = Blueprint("data", __name__)
 
 # 假定数据储存
 data_storage = []
 
+
 # 用于记录数据
-@data_blueprint.route('/record', methods = ['POST'])
+@data_blueprint.route("/record", methods=["POST"])
 def record_data():
     data = request.json
 
