@@ -38,9 +38,6 @@ def get_all_status():
     for room in rooms:
         status = Status.query.filter_by(room_id=room.id).first()
         if status:
-            room_data = {
-                "room": room.number,
-                "is_on": status.is_on
-            }
+            room_data = {"room": room.number, "is_on": status.is_on}
             response_data.append(room_data)
     return jsonify(response_data), 200
