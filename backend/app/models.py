@@ -9,10 +9,6 @@ class Device(db.Model):
     room = db.Column(db.String(255), unique=True, nullable=False)  # room为候选键，不为空
     public_key = db.Column(db.String(4096), nullable=False)  #
 
-    def __init__(self, room, public_key):  # 初始化
-        self.room = room
-        self.public_key = public_key
-
 
 # 暂且用来记录空调状态的改变
 class Record(db.Model):
@@ -22,13 +18,6 @@ class Record(db.Model):
     time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     unique_id = db.Column(db.String(16), nullable=False, unique=True)
     signature = db.Column(db.String(255), nullable=False)  # 数字签名
-
-    def __int__(self, room, operation, time, unique_id, signature):
-        self.room = room
-        self.operation = operation
-        self.time = time
-        self.unique_id = unique_id
-        self.signature = signature
 
 
 # 储存用户信息

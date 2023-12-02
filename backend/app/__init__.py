@@ -18,9 +18,13 @@ def create_app():
     from app.views.auth import auth_blueprint
     from app.views.data import data_blueprint
     from app.views.query import query_blueprint
-    from app.views.room import room
+    from app.views.room import room_blueprint
+    from app.views.admin import admin_blueprint
 
     app.register_blueprint(auth_blueprint)
     app.register_blueprint(data_blueprint)
+    app.register_blueprint(query_blueprint)
+    app.register_blueprint(room_blueprint)
+    app.register_blueprint(admin_blueprint)
 
     return app
