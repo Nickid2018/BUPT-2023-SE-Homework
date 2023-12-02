@@ -14,3 +14,5 @@ def check_csrf_token(request):
 
 
 # 调度算法
+def dispatch():
+    pass

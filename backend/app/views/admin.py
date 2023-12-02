@@ -31,7 +31,7 @@ def add_device():
     return jsonify({"room": device.room}), 200
 
 
-@admin_blueprint.route("/admin/device", method=["DELETE"])
+@admin_blueprint.route("/admin/device", methods=["DELETE"])
 def remove_device():
     # 检查用户是否已登录
     if "user_id" not in session:
@@ -56,7 +56,7 @@ def remove_device():
         return jsonify({"error": "Device not found"}), 404
 
 
-@admin_blueprint.route("/admin/devices", method=["GET"])
+@admin_blueprint.route("/admin/devices", methods=["GET"])
 def get_all_devices():
     # 检查用户是否已登录
     if "user_id" not in session:

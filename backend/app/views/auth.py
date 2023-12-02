@@ -32,7 +32,7 @@ def login():
         return jsonify({"error": "Login failed"}), 401
 
 
-@auth_blueprint.route("/logout", method=["POST"])
+@auth_blueprint.route("/logout", methods=["POST"])
 def logout():
     # 检查用户是否已登录
     if "session" in request.cookies:
