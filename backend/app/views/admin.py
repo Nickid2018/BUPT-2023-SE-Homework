@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, session
 from app import db
 from app.utils import check_csrf_token
 
-from app.models import Device  # 获取关于设备的信息
+from app.models import Device, Room, Status  # 获取关于设备的信息
 
 admin_blueprint = Blueprint("admin", __name__)
 
@@ -18,6 +18,7 @@ def add_device():
         return jsonify({"error": "CSRF token mismatch"}), 403
 
     # 获取添加房间的信息
+    # public_key是干什么的？
     data = request.get_json()
 
     room = data.get("room")

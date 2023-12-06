@@ -22,12 +22,12 @@ def check_in():
     room_id = data.get("room")
 
     # 根据实际情况处理房间入住逻辑
-    room = Room.query.filter_by(number=room_id).first()
+    room = Room.query.filter_by(id=room_id).first()
     if room:
         # 更新房间状态等信息
         # ...
 
-        return jsonify({"room": room.number}), 200
+        return jsonify({"room": room.id}), 200
     else:
         return jsonify({"error": "Room not found"}), 404
 
@@ -46,7 +46,7 @@ def check_out():
     room_number = data.get("room")
 
     # 根据实际情况处理房间退房逻辑
-    room = Room.query.filter_by(number=room_number).first()
+    room = Room.query.filter_by(id=room_number).first()
     if room:
         # 更新房间状态等信息
         # ...

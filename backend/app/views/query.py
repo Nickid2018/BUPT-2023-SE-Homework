@@ -2,6 +2,7 @@
 from flask import Blueprint, request, jsonify
 from app.models import Room, Status
 from app import db
+from sqlalchemy import desc
 
 query_blueprint = Blueprint("query", __name__)
 
@@ -17,7 +18,7 @@ def get_status(room_id):
         status = Status.query.filter_by(room_id=room.id).first()
         if status:
             response_data = {
-                "room": room.number,
+                "room": room.id,
                 "temperature": status.temperature,
                 "wind_speed": status.wind_speed,
                 "mode": status.mode,
@@ -36,8 +37,15 @@ def get_all_status():
     rooms = Room.query.all()
     response_data = []
     for room in rooms:
-        status = Status.query.filter_by(room_id=room.id).first()
+        status = Status.query.filter_by(room_id=room.id).order_by(desc(Status.last_update)).first()
         if status:
-            room_data = {"room": room.number, "is_on": status.is_on}
+            room_data = {
+                "room": room.id,
+                "is_on": status.is_on,
+                # "temperature": status.temperature,
+                # "wind_speed": status.wind_speed,
+                # "mode": status.mode,
+                # "sweep": status.sweep
+            }
             response_data.append(room_data)
     return jsonify(response_data), 200
