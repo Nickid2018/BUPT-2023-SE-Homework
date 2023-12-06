@@ -24,6 +24,8 @@ backend/
 |      |-- run.py           # 构建实例
 |      |-- models.py        # 数据库模型
 |      |-- utils.py         # 存储辅助函数和工具函数
+|-- data/
+|      |-- Bupt.db          # sqlite数据库
 |-- migrations/         # 数据库迁移文件
 |-- tests/              # 测试文件
 |-- manager.py          # 运行文件
