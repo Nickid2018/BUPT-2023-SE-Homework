@@ -37,7 +37,11 @@ def get_all_status():
     rooms = Room.query.all()
     response_data = []
     for room in rooms:
-        status = Status.query.filter_by(room_id=room.id).order_by(desc(Status.last_update)).first()
+        status = (
+            Status.query.filter_by(room_id=room.id)
+            .order_by(desc(Status.last_update))
+            .first()
+        )
         if status:
             room_data = {
                 "room": room.id,

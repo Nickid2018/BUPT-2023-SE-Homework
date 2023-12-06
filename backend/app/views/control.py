@@ -20,10 +20,14 @@ def server_control():
 
     operation = data.get("operation")
     room_id = data.get("room_id")
-    value = data.get("data")     # 调节温度、风速、模式
+    value = data.get("data")  # 调节温度、风速、模式
 
     # 查询对应房间状态
-    status = Status.query.filter_by(room_id=room_id).order_by(desc(Status.last_update)).first()
+    status = (
+        Status.query.filter_by(room_id=room_id)
+        .order_by(desc(Status.last_update))
+        .first()
+    )
 
     new_status = Status(
         room_id=status.room_id,
@@ -32,7 +36,7 @@ def server_control():
         mode=status.mode,
         sweep=status.sweep,
         is_on=status.is_on,
-        last_update=datetime.utcnow()
+        last_update=datetime.utcnow(),
     )
 
     # 根据操作类型执行相应的操作
@@ -45,7 +49,7 @@ def server_control():
     elif operation == "wind_speed":
         new_status.wind_speed = int(value)
     elif operation == "mode":
-        new_status.mode = value      # 这个有点问题
+        new_status.mode = value  # 这个有点问题
     elif operation == "sweep":
         new_status.sweep = True
     elif operation == "no_sweep":

@@ -16,6 +16,7 @@ def create_app():
 
     # 注册蓝图
     from app.views.auth import auth_blueprint
+
     # from app.views.data import data_blueprint
     from app.views.query import query_blueprint
     from app.views.room import room_blueprint
