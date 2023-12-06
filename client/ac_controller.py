@@ -10,23 +10,30 @@ class ACController(QObject):
         self.network_manager = network_manager
         self.database_manager = database_manager
         self.current_state = {
-            "room_id": "228",
-            "power": False,  # 初始状态为关
-            "set_temperature": 28,  # 用户设定的初始温度
-            "current_temperature": 28,  # 模拟的当前房间温度
-            "mode": "制冷",  # 初始模式
-            "wind_speed": "中",  # 初始风速
-            "sweep": False,  # 初始扫风状态
+            'room_id': '228',
+            'power': False,  # 初始状态为关
+            'set_temperature': 28,  # 用户设定的初始温度
+            'current_temperature': 28,  # 模拟的当前房间温度
+            'mode': '制冷',  # 初始模式
+            'wind_speed': '中',  # 初始风速
+            'sweep': False  # 初始扫风状态
         }
         self.temp_change_timer = QTimer()
         self.temp_change_timer.timeout.connect(self.update_temperature)
         self.temp_change_timer.start(10000)  # 每10秒更新一次温度
 
     def update_temperature(self):
-        """定时更新房间温度"""
-        if self.current_state["power"]:
-            self.current_state["current_temperature"] += 0.5
+        """ 定时更新房间温度 """
+        if self.current_state['power']:
+            # 制冷模式下温度降低
+            if self.current_state['mode'] == '制冷' and self.current_state['current_temperature'] > self.current_state['set_temperature']:
+                self.current_state['current_temperature'] -= 0.5
+            # 制热模式下温度升高
+            elif self.current_state['mode'] == '制热' and self.current_state['current_temperature'] < self.current_state['set_temperature']:
+                self.current_state['current_temperature'] += 0.5
+
             self.log_state()
+
 
     def toggle_power(self):
         """切换空调的开关状态"""
@@ -65,20 +72,20 @@ class ACController(QObject):
         self.log_state()
 
     def log_state(self):
-        """记录当前状态到数据库"""
-        self.current_state["time"] = time.strftime("%Y-%m-%dT%H:%M:%S")
+        """ 记录当前状态到数据库 """
+        self.current_state['time'] = time.strftime('%Y-%m-%dT%H:%M:%S')
         self.database_manager.log_state(self.current_state)
 
         # 更新 GUI 显示
-        if hasattr(self, "update_callback"):
+        if hasattr(self, 'update_callback'):
             self.update_callback()
 
     def set_update_callback(self, callback):
-        """设置一个回调函数用于更新 GUI 状态"""
+        """ 设置一个回调函数用于更新 GUI 状态 """
         self.update_callback = callback
 
     def get_current_state(self):
-        """返回当前的状态"""
+        """ 返回当前的状态 """
         return self.current_state
 
     def send_update(self, operation, data):
