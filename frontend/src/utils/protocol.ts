@@ -50,6 +50,20 @@ export function logout(csrfToken: string, successCallback: () => void, errorCall
   );
 }
 
+export function getAvailableDevices(csrfToken: string, successCallback: (data: any) => void, errorCallback: (errorCode: number) => void) {
+  createWithCSRFToken(protocol.get, "/admin/devices", csrfToken, {}).then(
+    (data) => successCallback(data),
+    (errorCode) => errorCallback(errorCode)
+  );
+}
+
+export function getAvailableDevicesWithOpen(csrfToken: string, successCallback: (data: any) => void, errorCallback: (errorCode: number) => void) {
+  createWithCSRFToken(protocol.get, "/status", csrfToken, {}).then(
+    (data) => successCallback(data),
+    (errorCode) => errorCallback(errorCode)
+  );
+}
+
 // Error Codes --------------------------------------------------
 export const ERROR_CODE_MAP: { [errorCode: number]: string } = {
   // Fallback Error Codes

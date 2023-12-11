@@ -14,7 +14,7 @@ import {ref} from "vue";
 
 const emit = defineEmits<{
   (event: 'close'): void,
-  (event: 'login', loginName: string, csrfToken: string): void
+  (event: 'login', loginName: string, csrfToken: string, role: string): void
 }>()
 
 const username = ref("");
@@ -31,7 +31,7 @@ function loginNow() {
     return;
   }
   login(username.value, password.value, (data) => {
-    emit('login', data.username, data.csrfToken);
+    emit('login', data.username, data.csrfToken, data.role);
     emit('close');
   }, errorCode => errorMessage.value = ERROR_CODE_MAP[errorCode] ?? UNKNOWN_ERROR);
 }
