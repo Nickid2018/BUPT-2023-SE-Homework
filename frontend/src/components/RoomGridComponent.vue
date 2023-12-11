@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {Ref, ref} from "vue";
+import {onMounted, onUnmounted, Ref, ref} from "vue";
 import {getAvailableDevices, getAvailableDevicesWithOpen} from "../utils/protocol.ts";
 
 const props = defineProps<{
@@ -16,8 +16,7 @@ const displayModeFunction: {
   [key: string]: (csrfToken: string, successCallback: (data: any) => void, errorCallback: (errorCode: number) => void) => void
 } = {
   "checkout": getAvailableDevices,
-  "admin": getAvailableDevicesWithOpen,
-  "test": supplyRoomDataTest
+  "admin": supplyRoomDataTest,
 }
 
 const roomDataList = ref({}) as Ref<{ [key: string]: any }>
@@ -25,13 +24,17 @@ const roomDataList = ref({}) as Ref<{ [key: string]: any }>
 // ---- test function
 function supplyRoomDataTest(csrfToken: string, successCallback: (data: any) => void, errorCallback: (errorCode: number) => void) {
   successCallback([
-    "1-114",
-    "1-115",
-    "1-116",
-    "2-223",
-    "2-224",
-    "2-233",
+    {"room": "1-114", "is_on": true},
+    {"room": "1-114", "is_on": false},
+    {"room": "1-114", "is_on": false},
+    {"room": "1-114", "is_on": false},
+    {"room": "1-114", "is_on": true},
+    {"room": "1-114", "is_on": false},
+    {"room": "1-114", "is_on": true},
+    {"room": "1-114", "is_on": false},
   ]);
+  errorCallback;
+  csrfToken;
 }
 
 // ----
@@ -46,20 +49,31 @@ function updateRoomData() {
   })
 }
 
-updateRoomData();
-setInterval(updateRoomData, 5000);
+let intervalId = 0;
+
+onMounted(() => {
+  updateRoomData();
+  intervalId = setInterval(updateRoomData, 5000);
+});
+
+onUnmounted(() => {
+  clearInterval(intervalId);
+});
 
 </script>
 
 <template>
-  <div class="flex flex-wrap gap-5 h-full p-5">
-    <div v-for="data in roomDataList" :key="data" class="
+  <div class="overflow-y-scroll">
+    <div class="flex flex-wrap gap-5 p-5">
+      <div v-for="data in roomDataList" :key="data" class="
           rounded-md drop-shadow-xl shadow-gray-200 bg-neutral-50 cursor-pointer
           hover:bg-primary-100 hover:shadow-primary-100 transition-all duration-150
-      ">
-      <div class="flex flex-col items-center justify-center m-4">
-        <div class="text-xl" @click="$emit('select-room', displayMode == 'admin' ? data.room : data)">
-          {{ displayMode == 'admin' ? data.room : data }}
+          shrink-0 min-w-[18%]
+      " @click="$emit('select-room', displayMode == 'admin' ? data.room : data)">
+        <div class="align-middle m-4">
+          <div class="text-xl text-center select-none">
+            {{ displayMode == 'admin' ? data.room : data }}
+          </div>
         </div>
       </div>
     </div>
