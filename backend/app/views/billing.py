@@ -21,10 +21,12 @@ def generate_bill():
     room_id = data.get("room_id")
 
     # 查询所有相关记录
-    statuses = Status.query.filter_by(room_id=room_id).order_by(desc(Status.last_update)).all()
+    statuses = (
+        Status.query.filter_by(room_id=room_id).order_by(desc(Status.last_update)).all()
+    )
 
-    total_cost = 0        # 总费用
-    detailed_bill = []    # 详细账单
+    total_cost = 0  # 总费用
+    detailed_bill = []  # 详细账单
     # 计算费用
     for i in range(len(statuses) - 1):
         start_time = statuses[i].last_update
@@ -41,14 +43,19 @@ def generate_bill():
             "speed": speed,
             "temperature": temperature,
             "sweep": sweep,
-            "electricity_cost": electricity_cost
+            "electricity_cost": electricity_cost,
         }
 
-    return jsonify({
-        "room_id": room_id,
-        "total_cost": total_cost,
-        "detailed_bill": detailed_bill
-    }), 200
+    return (
+        jsonify(
+            {
+                "room_id": room_id,
+                "total_cost": total_cost,
+                "detailed_bill": detailed_bill,
+            }
+        ),
+        200,
+    )
 
 
 # 计算费用
@@ -66,7 +73,7 @@ def calculate_cost(start_time, end_time, speed):
     speed_minutes = speed_to_minutes.get(speed, 0)
 
     # 计算用电量
-    energy_consumed = (delta_time / speed_minutes)
+    energy_consumed = delta_time / speed_minutes
 
     # 计算电费
     electricity_cost = energy_consumed * cost_rate
