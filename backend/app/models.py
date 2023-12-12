@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 # 每个 class 代表一张表
-# 设备信息
+# 设备信息，有点问题
 class Device(db.Model):
     id = db.Column(db.Integer, primary_key=True)  # 将id定义为主键
     room = db.Column(db.String(255), unique=True, nullable=False)  # room为候选键，不为空
