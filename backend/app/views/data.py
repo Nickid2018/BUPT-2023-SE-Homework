@@ -9,7 +9,7 @@ from app.utils import check_csrf_token
 data_blueprint = Blueprint("data", __name__)
 
 
-@data_blueprint.route("/record", methods=["POST"])
+# @data_blueprint.route("/record", methods=["POST"])
 # def record_data():
 #     # 检查 CSRF token
 #     if not check_csrf_token(request):
