@@ -13,7 +13,7 @@ query_blueprint = Blueprint("query", __name__)
 # 获得某个房间的状态
 @query_blueprint.route("/statue/<room_id>", methods=["GET"])
 def get_status(room_id):
-    room = Room.query.filter_by(numbers=room_id).first()
+    room = Room.query.filter_by(id=room_id).first()
     if room:
         status = Status.query.filter_by(room_id=room.id).first()
         if status:
@@ -29,6 +29,8 @@ def get_status(room_id):
             return jsonify(response_data), 200
         else:
             return jsonify({"error": "Status not found"}), 404
+    else:
+        return jsonify({"error": "Room not found"}), 404
 
 
 # 获得全部房间的状态
