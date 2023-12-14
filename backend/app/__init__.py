@@ -6,6 +6,7 @@ from flask_migrate import Migrate
 db = SQLAlchemy()
 migrate = Migrate()
 
+
 def create_app():
     app = Flask(__name__)
 
@@ -13,8 +14,8 @@ def create_app():
     app.config.from_object("app.config.Config")
 
     # 修改 host 和 port
-    app.config['HOST'] = '0.0.0.0'
-    app.config['PORT'] = 11451
+    app.config["HOST"] = "0.0.0.0"
+    app.config["PORT"] = 11451
 
     # 初始化扩展
     db.init_app(app)
@@ -22,6 +23,7 @@ def create_app():
 
     # 注册蓝图
     from app.views.auth import auth_blueprint
+
     # from app.views.data import data_blueprint
     from app.views.query import query_blueprint
     from app.views.room import room_blueprint
@@ -37,8 +39,8 @@ def create_app():
 
     # 测试
     from app.views import hello_blueprint
+
     app.register_blueprint(hello_blueprint)
 
     # app.run(host=host, port=port)
     return app
-
