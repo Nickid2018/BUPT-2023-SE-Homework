@@ -67,7 +67,7 @@ function logoutNow() {
 loginState.value = true;
 loginName.value = "test";
 loginCsrfToken.value = "test";
-role.value = "AC admin";
+role.value = "checkout";
 // --------------
 
 </script>
