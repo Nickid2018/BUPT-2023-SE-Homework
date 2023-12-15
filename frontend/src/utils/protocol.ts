@@ -82,6 +82,20 @@ export function checkOutRoom(csrfToken: string, room: string, successCallback: (
   );
 }
 
+export function addDevice(csrfToken: string, deviceData: any, successCallback: (data: any) => void, errorCallback: (errorCode: number) => void) {
+  createWithCSRFToken(protocol.put, "/admin/device", csrfToken, deviceData).then(
+    (data) => successCallback(data),
+    (errorCode) => errorCallback(errorCode)
+  );
+}
+
+export function removeDevice(csrfToken: string, deviceData: any, successCallback: (data: any) => void, errorCallback: (errorCode: number) => void) {
+  createWithCSRFToken(protocol.delete, "/admin/device", csrfToken, deviceData).then(
+    (data) => successCallback(data),
+    (errorCode) => errorCallback(errorCode)
+  );
+}
+
 // Error Codes --------------------------------------------------
 export const ERROR_CODE_MAP: { [errorCode: number]: string } = {
   // Fallback Error Codes
