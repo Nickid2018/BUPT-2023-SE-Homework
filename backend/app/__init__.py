@@ -29,6 +29,8 @@ def create_app():
     from app.views.room import room_blueprint
     from app.views.admin import admin_blueprint
     from app.views.control import control_blueprint
+    from app.views.client import client_blueprint
+    from app.views.billing import billing_blueprint
 
     app.register_blueprint(auth_blueprint)
     # app.register_blueprint(data_blueprint)
@@ -36,6 +38,8 @@ def create_app():
     app.register_blueprint(room_blueprint)
     app.register_blueprint(admin_blueprint)
     app.register_blueprint(control_blueprint)
+    app.register_blueprint(client_blueprint)
+    app.register_blueprint(billing_blueprint)
 
     # 测试
     from app.views import hello_blueprint

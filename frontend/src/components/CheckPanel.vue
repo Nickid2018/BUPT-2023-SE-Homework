@@ -1,19 +1,30 @@
 <script setup lang="ts">
 import RoomGridComponent from "./RoomGridComponent.vue";
 import {ref} from "vue";
+import {checkInRoom, checkOutRoom} from "../utils/protocol.ts";
 
-defineProps<{
+const props = defineProps<{
   loginCsrfToken: string
 }>()
 
 const selectedRoom = ref("");
+const checkedRooms = ref<string[]>([]);
 
 function checkIn() {
-  console.log("check in");
+  checkInRoom(props.loginCsrfToken, selectedRoom.value, () => {
+    checkedRooms.value.push(selectedRoom.value);
+  }, errorCode => {
+    console.log(errorCode);
+  });
 }
 
 function checkOut() {
-  console.log("check out");
+  checkOutRoom(props.loginCsrfToken, selectedRoom.value, () => {
+    checkedRooms.value = checkedRooms.value.filter(room => room !== selectedRoom.value);
+    // display
+  }, errorCode => {
+    console.log(errorCode);
+  });
 }
 
 </script>
@@ -31,11 +42,19 @@ function checkOut() {
       </div>
     </div>
     <div class="flex-1 flex flex-col items-start gap-8 border-l-2 border-neutral-300 py-5 h-fit">
-      <button class="ml-16 rounded-md bg-primary-100 hover:bg-primary-300 transition-all duration-150 px-7 py-2" @click="checkIn">
-        入住
+      <button
+          class="ml-16 rounded-md bg-primary-100 hover:bg-primary-300 transition-all duration-150 px-7 py-2"
+          :disabled="checkedRooms.includes(selectedRoom)"
+          @click="checkIn"
+      >
+        {{ checkedRooms.includes(selectedRoom) ? "已入住" : "入住" }}
       </button>
-      <button class="ml-16 rounded-md bg-primary-100 hover:bg-primary-300 transition-all duration-150 px-7 py-2" @click="checkOut">
-        退房
+      <button
+          class="ml-16 rounded-md bg-primary-100 hover:bg-primary-300 transition-all duration-150 px-7 py-2"
+          :disabled="!checkedRooms.includes(selectedRoom)"
+          @click="checkOut"
+      >
+        {{ !checkedRooms.includes(selectedRoom) ? "未入住" : "退房" }}
       </button>
     </div>
   </div>
