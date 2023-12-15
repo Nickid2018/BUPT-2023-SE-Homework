@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import RoomGridComponent from "./RoomGridComponent.vue";
 import {ref} from "vue";
-import {checkInRoom, checkOutRoom} from "../utils/protocol.ts";
+import {checkInRoom, checkOutRoom, DeviceData} from "../utils/protocol.ts";
+import CheckoutResultData from "./CheckoutResultData.vue";
 
 const props = defineProps<{
   loginCsrfToken: string
@@ -15,15 +16,47 @@ function checkIn() {
     checkedRooms.value.push(selectedRoom.value);
   }, errorCode => {
     console.log(errorCode);
+    checkedRooms.value.push(selectedRoom.value);
   });
 }
 
+function fakeCheckOut(successCallback: (data: DeviceData[]) => void) {
+  successCallback([
+    {
+      start_time: "2021-07-01 00:00:00",
+      end_time: "2021-07-01 00:00:10",
+      temperature: 25,
+      wind_speed: 1,
+      mode: "cold",
+      sweep: false,
+      duration: 600,
+      cost: 114
+    },
+    {
+      start_time: "2021-07-01 00:00:10",
+      end_time: "2021-07-01 00:00:20",
+      temperature: 24,
+      wind_speed: 1,
+      mode: "cold",
+      sweep: true,
+      duration: 600,
+      cost: 514
+    }
+  ]);
+}
+
+const checkoutResultData = ref<DeviceData[]>([]);
+
 function checkOut() {
-  checkOutRoom(props.loginCsrfToken, selectedRoom.value, () => {
+  // checkOutRoom(props.loginCsrfToken, selectedRoom.value, () => {
+  //   checkedRooms.value = checkedRooms.value.filter(room => room !== selectedRoom.value);
+  // }, errorCode => {
+  //   console.log(errorCode);
+  // });
+  checkOutRoom;
+  fakeCheckOut(data => {
     checkedRooms.value = checkedRooms.value.filter(room => room !== selectedRoom.value);
-    // display
-  }, errorCode => {
-    console.log(errorCode);
+    checkoutResultData.value = data;
   });
 }
 
@@ -58,4 +91,5 @@ function checkOut() {
       </button>
     </div>
   </div>
+  <CheckoutResultData v-if="checkoutResultData.length > 0" :data="checkoutResultData" @close="checkoutResultData = []"/>
 </template>

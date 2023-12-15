@@ -131,6 +131,8 @@ function selectRoom(room: string) {
 
   targetModeIndex.value = modeList.indexOf(selectRoomData.value.mode);
   modeDataSet.value = false;
+
+  targetSweep.value = selectRoomData.value.sweep;
 }
 
 </script>
@@ -181,7 +183,7 @@ function selectRoom(room: string) {
               }"
               @wheel="event => {
                 if (!temperatureDataSet)
-                  targetTemperature = Math.floor(Math.min(Math.max(targetTemperature + event.deltaY / 100, 16), 35));
+                  targetTemperature = Math.floor(Math.min(Math.max(targetTemperature - event.deltaY / 100, 16), 35));
               }"
               @click="sendTemperature"
           >
@@ -215,7 +217,7 @@ function selectRoom(room: string) {
               class="p-2 text-5xl font-bold cursor-pointer select-none"
               @wheel="event => {
                 if (!windSpeedDataSet)
-                  targetWindSpeed = Math.floor(Math.min(Math.max(targetWindSpeed + event.deltaY / 100, 1), 3));
+                  targetWindSpeed = Math.floor(Math.min(Math.max(targetWindSpeed - event.deltaY / 100, 1), 3));
               }"
               @click="sendWindSpeed"
           >
@@ -250,7 +252,7 @@ function selectRoom(room: string) {
               :class="MODE_COLOR[selectRoomData.mode]"
               @wheel="event => {
                 if (!modeDataSet)
-                  targetModeIndex = Math.floor(Math.min(Math.max(targetModeIndex + event.deltaY / 100, 0), 2));
+                  targetModeIndex = Math.floor(Math.min(Math.max(targetModeIndex - event.deltaY / 100, 0), 2));
               }"
               @click="sendMode"
           >

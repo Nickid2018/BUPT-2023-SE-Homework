@@ -73,11 +73,11 @@ export function checkInRoom(csrfToken: string, room: string, successCallback: (d
   );
 }
 
-export function checkOutRoom(csrfToken: string, room: string, successCallback: (data: any) => void, errorCallback: (errorCode: number) => void) {
+export function checkOutRoom(csrfToken: string, room: string, successCallback: (data: DeviceData[]) => void, errorCallback: (errorCode: number) => void) {
   createWithCSRFToken(protocol.post, "/room/check_out", csrfToken, {
     room: room
   }).then(
-    (data) => successCallback(data),
+    (data) => successCallback(data as unknown as DeviceData[]),
     (errorCode) => errorCallback(errorCode)
   );
 }
@@ -97,6 +97,17 @@ export function operationDevice(csrfToken: string, room: string, operation: stri
     (data) => successCallback(data),
     (errorCode) => errorCallback(errorCode)
   );
+}
+
+export interface DeviceData {
+  start_time: string;
+  end_time: string;
+  temperature: number;
+  wind_speed: number;
+  mode: string;
+  sweep: boolean;
+  duration: number;
+  cost: number;
 }
 
 export function addDevice(csrfToken: string, deviceData: any, successCallback: (data: any) => void, errorCallback: (errorCode: number) => void) {
