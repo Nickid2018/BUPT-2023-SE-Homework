@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify
 from app.models import Room, Status
 from app import db
 from sqlalchemy import desc
+from app.scheduler import room1
 
 query_blueprint = Blueprint("query", __name__)
 
@@ -15,11 +16,19 @@ query_blueprint = Blueprint("query", __name__)
 def get_status(room_id):
     room = Room.query.filter_by(id=room_id).first()
     if room:
-        status = Status.query.filter_by(room_id=room.id).first()
+        status = (
+            Status.query.filter_by(room_id=room.id)
+            .order_by(desc(Status.last_update))
+            .first()
+        )
         if status:
+            # 计算当前温度
+            current_temperature = 25
+
             response_data = {
                 "room": room.id,
                 "temperature": status.temperature,
+                "current_temperature": current_temperature,
                 "wind_speed": status.wind_speed,
                 "mode": status.mode,
                 "sweep": status.sweep,

@@ -5,6 +5,7 @@ from app import db
 from app.models import Status
 from datetime import datetime
 from sqlalchemy import desc
+from app.utils import generate_timestamp_id
 
 control_blueprint = Blueprint("control", __name__)
 
@@ -21,7 +22,6 @@ def server_control():
     operation = data.get("operation")
     room_id = data.get("room_id")
     value = data.get("data")  # 调节温度、风速、模式
-
     # 查询对应房间状态
     status = (
         Status.query.filter_by(room_id=room_id)
@@ -29,7 +29,11 @@ def server_control():
         .first()
     )
 
+    # 生成status_id
+    status_id = generate_timestamp_id()
+
     new_status = Status(
+        id=status_id,
         room_id=status.room_id,
         temperature=status.temperature,
         wind_speed=status.wind_speed,

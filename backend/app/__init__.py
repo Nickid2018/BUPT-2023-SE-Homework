@@ -46,5 +46,7 @@ def create_app():
 
     app.register_blueprint(hello_blueprint)
 
+    # 初始化房间
+
     # app.run(host=host, port=port)
     return app

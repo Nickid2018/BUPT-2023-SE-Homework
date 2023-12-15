@@ -29,6 +29,8 @@ def generate_bill():
     detailed_bill = []  # 详细账单
     # 计算费用
     for i in range(len(statuses) - 1):
+        if statuses[i].is_on == 0:
+            continue
         start_time = statuses[i].last_update
         end_time = statuses[i + 1].last_update
         speed = statuses[i].wind_speed
