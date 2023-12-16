@@ -21,6 +21,7 @@ def client_control(room_id, public_key, operation, value):
             rsa.encrypt(json.dumps({"operation": operation, "data": value}).encode(), public_key)
         ).decode(),
     )
+    print("Send control to ", client_remote_map[room_id], " with operation ", operation, " and value ", value)
     if response.status_code == 204:
         return True
     else:
@@ -167,6 +168,7 @@ class StatusScheduler:
         if room_id in self.cooldown_queue:
             self.cooldown_queue.remove(room_id)
             heapq.heapify(self.cooldown_queue)
+        self.room_scheduler_map[room_id].set_is_on(False)
         self.mutex.release()
 
     def schedule(self):
@@ -221,7 +223,7 @@ class StatusScheduler:
         # update temperature for not running rooms
         for room_id in self.room_scheduler_map:
             room_status = self.room_scheduler_map[room_id]
-            if room_status.last_update < time.time() - 120:
+            if room_status.last_update < time.time() - 120 and not room_status.is_on:
                 if room_status.temperature > room_status.initial_temperature:
                     room_status.set_temperature(room_status.temperature - 1)
                 elif room_status.temperature < room_status.initial_temperature:

@@ -33,7 +33,7 @@ const selectRoomData = ref({
   last_update: ""
 });
 
-function updateSelectRoomDataAndThen(selectRoom: string, callback?: () => void) {
+function updateSelectRoomDataAndThen(selectRoom: string) {
   selectedRoom.value = selectRoom;
   getRoomStatus(props.loginCsrfToken, selectRoom, data => {
     selectRoomData.value = data;
@@ -43,7 +43,17 @@ function updateSelectRoomDataAndThen(selectRoom: string, callback?: () => void) 
       windSpeedDataSet.value = false;
     if (modeList[targetModeIndex.value] === selectRoomData.value.mode)
       modeDataSet.value = false;
-    callback?.();
+
+    targetTemperature.value = selectRoomData.value.temperature;
+    targetWindSpeed.value = selectRoomData.value.wind_speed;
+
+    temperatureDataSet.value = false;
+    windSpeedDataSet.value = false;
+
+    targetModeIndex.value = modeList.indexOf(selectRoomData.value.mode);
+    modeDataSet.value = false;
+
+    targetSweep.value = selectRoomData.value.sweep;
   }, errorCode => {
     console.log(errorCode);
   });
@@ -70,7 +80,6 @@ function togglePower() {
     control("stop", "");
   else
     control("start", "");
-  selectRoom(selectedRoom.value);
 }
 
 const targetTemperature = ref(26);
@@ -130,18 +139,7 @@ function selectRoom(room: string) {
 
   selectedRoom.value = room;
 
-  updateSelectRoomDataAndThen(room, () => {
-    targetTemperature.value = selectRoomData.value.temperature;
-    targetWindSpeed.value = selectRoomData.value.wind_speed;
-
-    temperatureDataSet.value = false;
-    windSpeedDataSet.value = false;
-
-    targetModeIndex.value = modeList.indexOf(selectRoomData.value.mode);
-    modeDataSet.value = false;
-
-    targetSweep.value = selectRoomData.value.sweep;
-  });
+  updateSelectRoomDataAndThen(room);
 }
 
 </script>

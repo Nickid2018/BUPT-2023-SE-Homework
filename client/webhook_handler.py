@@ -6,6 +6,7 @@ import socket
 import rsa
 
 import constants
+from ac_controller import MODE_SWITCH
 
 
 class WebHookHandler(BaseHTTPRequestHandler):
@@ -33,7 +34,7 @@ class WebHookHandler(BaseHTTPRequestHandler):
         if operation == 'wind_speed':
             constants.ac_controller.get_current_state()['wind_speed'] = int(post_data['data'])
         if operation == 'mode':
-            constants.ac_controller.get_current_state()['mode'] = post_data['data']
+            constants.ac_controller.get_current_state()['mode'] = MODE_SWITCH.index(post_data['data'])
         if operation == 'sweep':
             constants.ac_controller.get_current_state()['sweep'] = post_data['data'] == 'True'
         constants.ac_controller.safe_update_callback()
