@@ -46,5 +46,5 @@ flask db upgrade
 ```
 
 ### 问题
-1. 不知道为什么在client.py和control.py中的字典不起作用
-2. 在调度更新的时候缺少记录更新
+1. 不知道为什么在client.py和control.py中的字典不起作用，已解决
+2. 在调度更新的时候缺少记录更新，未解决

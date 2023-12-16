@@ -48,7 +48,11 @@ def check_out():
     # 根据实际情况处理房间退房逻辑
     room = Device.query.filter_by(room=room_number).first()
     if room:
-        statuses = Status.query.filter_by(room_id=room.id).order_by(desc(Status.last_update)).all()
+        statuses = (
+            Status.query.filter_by(room_id=room.id)
+            .order_by(desc(Status.last_update))
+            .all()
+        )
 
         total_cost = 0  # 总费用
         total_time = 0
@@ -67,17 +71,18 @@ def check_out():
             electricity_cost = calculate_cost(speed, delta_time)
             total_cost += electricity_cost
             total_time += delta_time
-            detailed_bill.append({
-                "start_time": start_time.strftime("%Y-%m-%d %H:%M:%S"),
-                "end_time": end_time.strftime("%Y-%m-%d %H:%M:%S"),
-                "wind_speed": speed,
-                "temperature": temperature,
-                "sweep": sweep,
-                "mode": statuses[i].mode,
-                "duration": delta_time,
-                "cost": math.ceil(electricity_cost * 100) / 100
-            })
-
+            detailed_bill.append(
+                {
+                    "start_time": start_time.strftime("%Y-%m-%d %H:%M:%S"),
+                    "end_time": end_time.strftime("%Y-%m-%d %H:%M:%S"),
+                    "wind_speed": speed,
+                    "temperature": temperature,
+                    "sweep": sweep,
+                    "mode": statuses[i].mode,
+                    "duration": delta_time,
+                    "cost": math.ceil(electricity_cost * 100) / 100,
+                }
+            )
 
         # 更新房间状态等信息，删除这一阶段所有的记录
         status_to_delete = Status.query.filter_by(room_id=room.id).all()
@@ -87,11 +92,19 @@ def check_out():
         # 提交修改
         db.session.commit()
 
-        return jsonify({"room": room.room, "report": {
-            "total_cost": math.ceil(total_cost * 100) / 100,
-            "total_time": total_time,
-            "details": detailed_bill
-        }}), 200
+        return (
+            jsonify(
+                {
+                    "room": room.room,
+                    "report": {
+                        "total_cost": math.ceil(total_cost * 100) / 100,
+                        "total_time": total_time,
+                        "details": detailed_bill,
+                    },
+                }
+            ),
+            200,
+        )
     else:
         return jsonify({"error": "Room not found"}), 404
 
