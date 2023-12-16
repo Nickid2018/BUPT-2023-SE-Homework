@@ -10,7 +10,7 @@ const props = defineProps<{
 const MODE_NAME_MAP: {
   [key: string]: string
 } = {
-  "cold": "制冷",
+  "cool": "制冷",
   "hot": "制热",
   "wind": "送风"
 };
@@ -18,7 +18,7 @@ const MODE_NAME_MAP: {
 const MODE_COLOR: {
   [key: string]: string
 } = {
-  "cold": "text-blue-500",
+  "cool": "text-blue-500",
   "hot": "text-red-500",
   "wind": "text-green-500"
 };
@@ -28,12 +28,12 @@ const selectRoomData = ref({
   is_on: true,
   temperature: 26,
   wind_speed: 0,
-  mode: "cold",
+  mode: "cool",
   sweep: false,
   last_update: ""
 });
 
-function updateSelectRoomData(selectRoom: string) {
+function updateSelectRoomDataAndThen(selectRoom: string, callback?: () => void) {
   selectedRoom.value = selectRoom;
   getRoomStatus(props.loginCsrfToken, selectRoom, data => {
     selectRoomData.value = data;
@@ -43,6 +43,7 @@ function updateSelectRoomData(selectRoom: string) {
       windSpeedDataSet.value = false;
     if (modeList[targetModeIndex.value] === selectRoomData.value.mode)
       modeDataSet.value = false;
+    callback?.();
   }, errorCode => {
     console.log(errorCode);
   });
@@ -58,7 +59,7 @@ function getTemperatureColor(temperature: number) {
 // ---- Control ----
 function control(operation: string, data: any) {
   operationDevice(props.loginCsrfToken, selectedRoom.value, operation, data, () => {
-    updateSelectRoomData(selectedRoom.value);
+    updateSelectRoomDataAndThen(selectedRoom.value);
   }, errorCode => {
     console.log(errorCode);
   });
@@ -69,6 +70,7 @@ function togglePower() {
     control("stop", "");
   else
     control("start", "");
+  selectRoom(selectedRoom.value);
 }
 
 const targetTemperature = ref(26);
@@ -91,7 +93,7 @@ function sendWindSpeed() {
   }
 }
 
-const modeList = ["cold", "hot", "wind"];
+const modeList = ["cool", "hot", "wind"];
 
 const targetModeIndex = ref(0);
 const modeDataSet = ref(false);
@@ -116,7 +118,7 @@ let intervalId = 0;
 
 onMounted(() => intervalId = setInterval(() => {
   if (selectedRoom.value !== "")
-    updateSelectRoomData(selectedRoom.value);
+    updateSelectRoomDataAndThen(selectedRoom.value);
 }, 5000));
 
 onUnmounted(() => clearInterval(intervalId));
@@ -127,18 +129,19 @@ function selectRoom(room: string) {
   if (selectedRoom.value === room) return;
 
   selectedRoom.value = room;
-  updateSelectRoomData(room);
 
-  targetTemperature.value = selectRoomData.value.temperature;
-  targetWindSpeed.value = selectRoomData.value.wind_speed;
+  updateSelectRoomDataAndThen(room, () => {
+    targetTemperature.value = selectRoomData.value.temperature;
+    targetWindSpeed.value = selectRoomData.value.wind_speed;
 
-  temperatureDataSet.value = false;
-  windSpeedDataSet.value = false;
+    temperatureDataSet.value = false;
+    windSpeedDataSet.value = false;
 
-  targetModeIndex.value = modeList.indexOf(selectRoomData.value.mode);
-  modeDataSet.value = false;
+    targetModeIndex.value = modeList.indexOf(selectRoomData.value.mode);
+    modeDataSet.value = false;
 
-  targetSweep.value = selectRoomData.value.sweep;
+    targetSweep.value = selectRoomData.value.sweep;
+  });
 }
 
 </script>
