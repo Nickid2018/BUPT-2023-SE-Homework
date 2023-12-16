@@ -13,9 +13,9 @@ def add_device():
     if "user_id" not in session:
         return jsonify({"error": "Unauthorized"}), 401
 
-    # 检查 CSRF token
-    if not check_csrf_token(request):
-        return jsonify({"error": "CSRF token mismatch"}), 403
+    # # 检查 CSRF token
+    # if not check_csrf_token(request):
+    #     return jsonify({"error": "CSRF token mismatch"}), 403
 
     # 获取添加房间的信息
     # public_key是干什么的？
@@ -63,9 +63,9 @@ def get_all_devices():
     if "user_id" not in session:
         return jsonify({"error": "Unauthorized"}), 401
 
-    # 检查 CSRF token
-    if not check_csrf_token(request):
-        return jsonify({"error": "CSRF token mismatch"}), 403
+    # # 检查 CSRF token
+    # if not check_csrf_token(request):
+    #     return jsonify({"error": "CSRF token mismatch"}), 403
 
     # 根据实际情况从数据库中获取所有设备信息
     devices = Device.query.all()

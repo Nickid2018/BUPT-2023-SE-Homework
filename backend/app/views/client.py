@@ -55,7 +55,7 @@ def handle_client_online():
     return jsonify({"message": "Online successfully"}), 204
 
 
-# 处理客户端请求，有个小问题，需要客户端
+# 处理客户端请求，有个小问题，需要客户端有退房的逻辑，
 @client_blueprint.route("/device/client/<room_id>", methods=["POST"])
 def handle_client_operation(room_id):
     # 处理请求

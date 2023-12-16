@@ -10,18 +10,22 @@ auth_blueprint = Blueprint("auth", __name__)
 # 未调用页面
 
 
-@auth_blueprint.route("/login", methods=["POST"])
+@auth_blueprint.route("/api/login", methods=["POST"])
 def login():
-    data = request.get_json()
+    data = request.json
 
     username = data.get("username")
     password = data.get("password")
+
+    # 打印相关信息
+    # print('Received data:', request.data)
 
     # 从数据库中获取用户信息
     user = User.query.filter_by(username=username).first()  # 这里需要修改
 
     # 将输入内容进行验证
-    if user and check_password_hash(user.password_hash, password):  # 这里需要修改
+    # if user and check_password_hash(user.password_hash, password):  # 这里需要修改
+    if user and user.password == password:
         # 登录成功
         session["user_id"] = user.id
         session.permanent = True  # 设置会话为永久有效
@@ -32,7 +36,7 @@ def login():
         return jsonify({"error": "Login failed"}), 401
 
 
-@auth_blueprint.route("/logout", methods=["POST"])
+@auth_blueprint.route("/api/logout", methods=["POST"])
 def logout():
     # 检查用户是否已登录
     if "session" in request.cookies:

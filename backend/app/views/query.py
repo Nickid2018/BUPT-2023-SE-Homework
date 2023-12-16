@@ -3,12 +3,20 @@ from flask import Blueprint, request, jsonify
 from app.models import Room, Status
 from app import db
 from sqlalchemy import desc
-from app.scheduler import room1
+from app.scheduler import room1, room2, room3, room4, room5
+
 
 query_blueprint = Blueprint("query", __name__)
 
 
-# 未添加异常处理
+# room字典
+rooms = {
+    1: room1,
+    2: room2,
+    3: room3,
+    4: room4,
+    5: room5
+}
 
 
 # 获得某个房间的状态
@@ -21,9 +29,14 @@ def get_status(room_id):
             .order_by(desc(Status.last_update))
             .first()
         )
+
+        # 获取相应的调度房间
+        selected_room = rooms.get(room_id)
+
         if status:
             # 计算当前温度
-            current_temperature = 25
+            selected_room.update_temperature()
+            current_temperature = selected_room.current_temperature
 
             response_data = {
                 "room": room.id,
@@ -45,9 +58,9 @@ def get_status(room_id):
 # 获得全部房间的状态
 @query_blueprint.route("/status", methods=["GET"])
 def get_all_status():
-    rooms = Room.query.all()
+    all_room = Room.query.all()
     response_data = []
-    for room in rooms:
+    for room in all_room:
         status = (
             Status.query.filter_by(room_id=room.id)
             .order_by(desc(Status.last_update))
