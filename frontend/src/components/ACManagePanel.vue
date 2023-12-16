@@ -37,6 +37,12 @@ function updateSelectRoomData(selectRoom: string) {
   selectedRoom.value = selectRoom;
   getRoomStatus(props.loginCsrfToken, selectRoom, data => {
     selectRoomData.value = data;
+    if (targetTemperature.value === selectRoomData.value.temperature)
+      temperatureDataSet.value = false;
+    if (targetWindSpeed.value === selectRoomData.value.wind_speed)
+      windSpeedDataSet.value = false;
+    if (modeList[targetModeIndex.value] === selectRoomData.value.mode)
+      modeDataSet.value = false;
   }, errorCode => {
     console.log(errorCode);
   });
@@ -198,7 +204,7 @@ function selectRoom(room: string) {
         </div>
         <div class="flex-1 flex items-center">
           <div
-              v-if="targetTemperature != selectRoomData.temperature"
+              v-if="targetTemperature != selectRoomData.temperature && selectRoomData.is_on"
               class="text-neutral-500 text-xl"
               style="transform: skewX(-15deg)"
           >
@@ -232,7 +238,7 @@ function selectRoom(room: string) {
         </div>
         <div class="flex-1 flex items-center">
           <div
-              v-if="targetWindSpeed != selectRoomData.wind_speed"
+              v-if="targetWindSpeed != selectRoomData.wind_speed && selectRoomData.is_on"
               class="text-neutral-500 text-xl"
               style="transform: skewX(-15deg)"
           >
@@ -267,7 +273,7 @@ function selectRoom(room: string) {
         </div>
         <div class="flex-1 flex items-center">
           <div
-              v-if="modeList[targetModeIndex] != selectRoomData.mode"
+              v-if="modeList[targetModeIndex] != selectRoomData.mode && selectRoomData.is_on"
               class="text-neutral-500 text-xl"
               style="transform: skewX(-15deg)"
           >
@@ -301,7 +307,7 @@ function selectRoom(room: string) {
         </div>
         <div class="flex-1 flex items-center">
           <div
-              v-if="targetSweep != selectRoomData.sweep"
+              v-if="targetSweep != selectRoomData.sweep && selectRoomData.is_on"
               class="text-neutral-500 text-xl"
               style="transform: skewX(-15deg)"
           >

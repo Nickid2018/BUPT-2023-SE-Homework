@@ -3,8 +3,9 @@ import RoomGridComponent from "./RoomGridComponent.vue";
 import {ref} from "vue";
 import AddDevice from "./AddDevice.vue";
 import CancelDevice from "./CancelDevice.vue";
+import {addDevice, removeDevice} from "../utils/protocol.ts";
 
-defineProps<{
+const props = defineProps<{
   loginCsrfToken: string
 }>()
 
@@ -30,6 +31,27 @@ const closeCancelDevice = () => {
   isCancelDeviceOpen.value = false;
 };
 
+function confirmAddDevice(roomValue: string, keyInputValue: string) {
+  addDevice(props.loginCsrfToken, {
+    room: roomValue,
+    public_key: keyInputValue
+  }, () => {
+    closeAddDevice();
+  }, errorCode => {
+    console.log(errorCode);
+  });
+}
+
+function confirmCancelDevice(roomValue: string) {
+  removeDevice(props.loginCsrfToken, {
+    room: roomValue
+  }, () => {
+    closeCancelDevice();
+  }, errorCode => {
+    console.log(errorCode);
+  });
+}
+
 </script>
 
 <template>
@@ -44,7 +66,7 @@ const closeCancelDevice = () => {
       取消设备
     </button>
   </div>
-  <AddDevice v-if="isAddDeviceOpen" @close-modal="closeAddDevice" />
-  <CancelDevice v-if="isCancelDeviceOpen" @close-modal="closeCancelDevice" />
+  <AddDevice v-if="isAddDeviceOpen" @close-modal="closeAddDevice" @confirm="confirmAddDevice" />
+  <CancelDevice v-if="isCancelDeviceOpen" @close-modal="closeCancelDevice" @confirm-cancel="confirmCancelDevice"/>
                     
 </template>

@@ -1,8 +1,9 @@
 from flask import Blueprint, request, jsonify, session
 from app import db
+from app.scheduler import RoomScheduler, room_scheduler_map
 from app.utils import check_csrf_token
 
-from app.models import Device, Room, Status  # 获取关于设备的信息
+from app.models import Device, Status  # 获取关于设备的信息
 
 admin_blueprint = Blueprint("admin", __name__)
 
@@ -28,6 +29,8 @@ def add_device():
     device = Device(room=room, public_key=public_key)
     db.session.add(device)
     db.session.commit()
+
+    room_scheduler_map[room.id] = RoomScheduler(room.id, 25, 25)
 
     return jsonify({"room": device.room}), 200
 

@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
@@ -9,6 +10,7 @@ migrate = Migrate()
 
 def create_app():
     app = Flask(__name__)
+    CORS(app, origins="*", supports_credentials=True)
 
     # 导入配置
     app.config.from_object("app.config.Config")
@@ -40,11 +42,6 @@ def create_app():
     app.register_blueprint(control_blueprint)
     app.register_blueprint(client_blueprint)
     app.register_blueprint(billing_blueprint)
-
-    # 测试
-    from app.views import hello_blueprint
-
-    app.register_blueprint(hello_blueprint)
 
     # 初始化房间
 

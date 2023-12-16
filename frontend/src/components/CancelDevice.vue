@@ -18,7 +18,6 @@ const emit = defineEmits<{
 
 const confirmCancel = () => {
   emit('confirm-cancel', roomValue.value, keyInputValue.value);
-  closeModal();
 };
 
 const closeModal = () => {

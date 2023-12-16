@@ -64,10 +64,10 @@ function logoutNow() {
 }
 
 // test code ----
-loginState.value = true;
-loginName.value = "test";
-loginCsrfToken.value = "test";
-role.value = "checkout";
+// loginState.value = true;
+// loginName.value = "test";
+// loginCsrfToken.value = "test";
+// role.value = "checkout";
 // --------------
 
 </script>

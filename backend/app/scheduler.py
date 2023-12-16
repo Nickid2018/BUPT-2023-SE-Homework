@@ -4,6 +4,8 @@ from app import db
 import time
 import asyncio
 
+from app.models import Device
+
 
 class RoomScheduler:
     def __init__(self, room_id, initial_temperature, target_temperature):
@@ -107,9 +109,4 @@ class Scheduler:
 # 实例化调度器
 scheduler = Scheduler()
 
-# 房间初始化
-room1 = RoomScheduler(room_id=1, initial_temperature=32, target_temperature=25)
-room2 = RoomScheduler(room_id=2, initial_temperature=28, target_temperature=25)
-room3 = RoomScheduler(room_id=3, initial_temperature=30, target_temperature=25)
-room4 = RoomScheduler(room_id=4, initial_temperature=29, target_temperature=25)
-room5 = RoomScheduler(room_id=5, initial_temperature=35, target_temperature=25)
+room_scheduler_map = {}

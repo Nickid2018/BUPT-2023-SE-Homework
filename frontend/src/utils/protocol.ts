@@ -118,7 +118,14 @@ export function addDevice(csrfToken: string, deviceData: any, successCallback: (
 }
 
 export function removeDevice(csrfToken: string, deviceData: any, successCallback: (data: any) => void, errorCallback: (errorCode: number) => void) {
-  createWithCSRFToken(protocol.delete, "/admin/device", csrfToken, deviceData).then(
+  protocol.request({
+    url: "/admin/device",
+    method: "delete",
+    headers: {
+      'X-CSRF-Token': csrfToken
+    },
+    data: deviceData
+  }).then(
     (data) => successCallback(data),
     (errorCode) => errorCallback(errorCode)
   );

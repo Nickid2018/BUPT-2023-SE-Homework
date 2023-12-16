@@ -2,7 +2,7 @@
 
 from flask import Blueprint, request, jsonify, session
 from app import db
-from app.models import Room, Status
+from app.models import Status, Device
 from app.utils import check_csrf_token
 
 room_blueprint = Blueprint("room", __name__)
@@ -22,12 +22,12 @@ def check_in():
     room_id = data.get("room")
 
     # 根据实际情况处理房间入住逻辑
-    room = Room.query.filter_by(id=room_id).first()
+    room = Device.query.filter_by(room=room_id).first()
     if room:
         # 更新房间状态等信息
         # ...
 
-        return jsonify({"room": room.id}), 200
+        return jsonify({"room": room.room}), 200
     else:
         return jsonify({"error": "Room not found"}), 404
 
@@ -46,10 +46,10 @@ def check_out():
     room_number = data.get("room")
 
     # 根据实际情况处理房间退房逻辑
-    room = Room.query.filter_by(id=room_number).first()
+    room = Device.query.filter_by(room=room_number).first()
     if room:
         # 更新房间状态等信息，删除这一阶段所有的记录
-        status_to_delete = Status.query.filter.by(room_id=room_number).all()
+        status_to_delete = Status.query.filter.by(room_id=room.id).all()
         for status in status_to_delete:
             db.session.delete(status)
 

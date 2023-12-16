@@ -2,16 +2,18 @@ from flask import Blueprint, request, jsonify, session, current_app
 from app import db
 from werkzeug.security import check_password_hash
 
-from app.models import User  # 从数据库处理文件中获取数据
+from app.models import User, Device  # 从数据库处理文件中获取数据
+from app.scheduler import room_scheduler_map, RoomScheduler
 
 # 创建一个蓝图对象
 auth_blueprint = Blueprint("auth", __name__)
 
-# 未调用页面
-
-
 @auth_blueprint.route("/api/login", methods=["POST"])
 def login():
+    if len(room_scheduler_map) == 0:
+        for room in Device.query.all():
+            room_scheduler_map[room.id] = RoomScheduler(room.id, 25, 25)
+
     data = request.json
 
     username = data.get("username")
@@ -31,7 +33,7 @@ def login():
         session.permanent = True  # 设置会话为永久有效
         csrf_token = generate_csrf_token()  # 生成 CSRF token
         session["csrf_token"] = csrf_token
-        return jsonify({"username": user.username, "csrf_token": csrf_token}), 200
+        return jsonify({"username": user.username, "role": user.role, "csrf_token": csrf_token}), 200
     else:
         return jsonify({"error": "Login failed"}), 401
 
