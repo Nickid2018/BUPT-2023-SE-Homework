@@ -37,4 +37,14 @@ backend/
 # 使用
 ```
 flask run --host=0.0.0.0 --port=11451 --debug   # 运行项目
+
+# 初始化数据库
+set FLASK_APP=cli.py
+flask db init
+flask db migrate -m "Initial migration"
+flask db upgrade
 ```
+
+### 问题
+1. 不知道为什么在client.py和control.py中的字典不起作用
+2. 在调度更新的时候缺少记录更新
