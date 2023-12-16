@@ -23,10 +23,10 @@ def main():
     constants.private_key = rsa.PrivateKey.load_pkcs1(("-----BEGIN RSA PRIVATE KEY-----\n" + private_key_str + "\n-----END RSA PRIVATE KEY-----").encode())
 
     # 创建空调控制器实例
-    ac_controller = ACController()
+    constants.ac_controller = ACController()
 
     # 创建主窗口实例
-    main_window = MainAppWindow(ac_controller)
+    main_window = MainAppWindow(constants.ac_controller)
 
     # 显示主窗口
     main_window.show()

@@ -1,6 +1,12 @@
+import base64
 import json
 from http.server import BaseHTTPRequestHandler
 import socket
+
+import rsa
+
+import constants
+
 
 class WebHookHandler(BaseHTTPRequestHandler):
     def do_POST(self):
@@ -13,11 +19,26 @@ class WebHookHandler(BaseHTTPRequestHandler):
 
         content_length = int(self.headers['Content-Length'])
         post_data = self.rfile.read(content_length)
-        data = json.loads(post_data)
+        post_data = json.loads(rsa.decrypt(base64.urlsafe_b64decode(post_data), constants.private_key).decode())
 
-        print(data)
+        print(post_data)
 
-        data_ret = str(json.dumps(data) + "\n").encode()
+        operation = post_data['operation']
+        if operation == 'start':
+            constants.ac_controller.get_current_state()['power'] = True
+        if operation == 'stop':
+            constants.ac_controller.get_current_state()['power'] = False
+        if operation == 'temperature':
+            constants.ac_controller.get_current_state()['set_temperature'] = int(post_data['data'])
+        if operation == 'wind_speed':
+            constants.ac_controller.get_current_state()['wind_speed'] = int(post_data['data'])
+        if operation == 'mode':
+            constants.ac_controller.get_current_state()['mode'] = post_data['data']
+        if operation == 'sweep':
+            constants.ac_controller.get_current_state()['sweep'] = post_data['data'] == 'True'
+        constants.ac_controller.safe_update_callback()
+
+        data_ret = str(json.dumps(post_data) + "\n").encode()
         content_length = len(data_ret)
 
         self.send_response(200)

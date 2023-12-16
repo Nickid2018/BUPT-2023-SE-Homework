@@ -41,7 +41,6 @@ class MainAppWindow(QMainWindow):
         main_layout.addWidget(self.status_frame)
         self.status_labels = {
             "set_temperature": QLabel("设定温度："),
-            "current_temperature": QLabel("当前房间温度："),
             "sweep": QLabel("扫风："),
             "wind_speed": QLabel("风速："),
             "mode": QLabel("模式："),
@@ -85,9 +84,6 @@ class MainAppWindow(QMainWindow):
         state = self.ac_controller.get_current_state()
         self.status_labels["set_temperature"].setText(
             f'设定温度：{state["set_temperature"]}°C'
-        )
-        self.status_labels["current_temperature"].setText(
-            f'当前房间温度：{state["current_temperature"]}°C'
         )
         self.status_labels["sweep"].setText(f'扫风：{"开" if state["sweep"] else "关"}')
         self.status_labels["wind_speed"].setText(f'风速：{state["wind_speed"]}')

@@ -17,6 +17,7 @@ def sign(sign_text):
 
 
 def send_request(url, data):
+    print("Sending request to ", url, " with data ", data)
     response = requests.post(url, json=data)
 
     if response.status_code == 204:

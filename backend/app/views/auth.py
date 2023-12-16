@@ -3,24 +3,22 @@ from app import db
 from werkzeug.security import check_password_hash
 
 from app.models import User, Device  # 从数据库处理文件中获取数据
-from app.scheduler import room_scheduler_map, RoomScheduler
+from app.scheduler import scheduler
 
 # 创建一个蓝图对象
 auth_blueprint = Blueprint("auth", __name__)
 
 @auth_blueprint.route("/api/login", methods=["POST"])
 def login():
-    if len(room_scheduler_map) == 0:
+    if not scheduler.special_initialized:
         for room in Device.query.all():
-            room_scheduler_map[room.id] = RoomScheduler(room.id, 25, 25)
+            scheduler.room_online(room.id, room.public_key)
+        scheduler.special_initialized = True
 
     data = request.json
 
     username = data.get("username")
     password = data.get("password")
-
-    # 打印相关信息
-    # print('Received data:', request.data)
 
     # 从数据库中获取用户信息
     user = User.query.filter_by(username=username).first()  # 这里需要修改

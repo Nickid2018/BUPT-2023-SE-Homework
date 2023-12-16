@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, session
 from app import db
-from app.scheduler import RoomScheduler, room_scheduler_map
+from app.scheduler import scheduler
 from app.utils import check_csrf_token
 
 from app.models import Device, Status  # 获取关于设备的信息
@@ -18,8 +18,6 @@ def add_device():
     # if not check_csrf_token(request):
     #     return jsonify({"error": "CSRF token mismatch"}), 403
 
-    # 获取添加房间的信息
-    # public_key是干什么的？
     data = request.get_json()
 
     room = data.get("room")
@@ -30,7 +28,7 @@ def add_device():
     db.session.add(device)
     db.session.commit()
 
-    room_scheduler_map[room.id] = RoomScheduler(room.id, 25, 25)
+    scheduler.room_online(device.id, public_key)
 
     return jsonify({"room": device.room}), 200
 

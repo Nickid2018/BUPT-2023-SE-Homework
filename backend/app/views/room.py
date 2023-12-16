@@ -27,9 +27,6 @@ def check_in():
     # 根据实际情况处理房间入住逻辑
     room = Device.query.filter_by(room=room_id).first()
     if room:
-        # 更新房间状态等信息
-        # ...
-
         return jsonify({"room": room.room}), 200
     else:
         return jsonify({"error": "Room not found"}), 404

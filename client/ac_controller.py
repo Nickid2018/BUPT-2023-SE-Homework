@@ -1,4 +1,4 @@
-import base64
+import sys
 import time
 from PyQt5.QtCore import QObject
 
@@ -33,12 +33,11 @@ class ACController(QObject):
         super().__init__()
         self.update_callback = None
         self.current_state = {
-            'room_id': '228',
+            'room_id': sys.argv[1],
             'power': False,  # 初始状态为关
-            'set_temperature': 28,  # 用户设定的初始温度
-            'current_temperature': 28,  # 模拟的当前房间温度
+            'set_temperature': 26,  # 用户设定的初始温度
             'mode': 0,  # 初始模式
-            'wind_speed': 2,  # 初始风速
+            'wind_speed': 1,  # 初始风速
             'sweep': False  # 初始扫风状态
         }
 
@@ -48,23 +47,23 @@ class ACController(QObject):
         self.safe_update_callback()
 
     def increase_temperature(self):
-        send_update("temperature", min(self.current_state["set_temperature"] + 1, 35))
+        send_update("temperature", str(min(self.current_state["set_temperature"] + 1, 35)))
         self.safe_update_callback()
 
     def decrease_temperature(self):
-        send_update("temperature", max(self.current_state["set_temperature"] + 1, 16))
+        send_update("temperature", str(max(self.current_state["set_temperature"] - 1, 16)))
         self.safe_update_callback()
 
     def toggle_mode(self):
-        send_update("mode", MODE_SWITCH[(self.current_state["mode"] + 1) % len(MODE_SWITCH)])
+        send_update("mode", str(MODE_SWITCH[(self.current_state["mode"] + 1) % len(MODE_SWITCH)]))
         self.safe_update_callback()
 
     def change_wind_speed(self):
-        send_update("wind_speed", (self.current_state["wind_speed"] - 1) % 3 + 1)
+        send_update("wind_speed", str((self.current_state["wind_speed"] - 1) % 3 + 1))
         self.safe_update_callback()
 
     def toggle_sweep(self):
-        send_update("sweep", not self.current_state["sweep"])
+        send_update("sweep", str(not self.current_state["sweep"]))
         self.safe_update_callback()
 
     def safe_update_callback(self):
