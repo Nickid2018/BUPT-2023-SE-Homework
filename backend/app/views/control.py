@@ -12,12 +12,15 @@ control_blueprint = Blueprint("control", __name__)
 
 
 def make_status(room_number_id, operation, value):
-    selected_room = room_scheduler_map[room_number_id]      # 这里可能有问题
-    selected_room = room_scheduler_map[room_number_id]      # 这里可能有问题
+    selected_room = room_scheduler_map[room_number_id]  # 这里可能有问题
+    selected_room = room_scheduler_map[room_number_id]  # 这里可能有问题
 
     # 查询对应房间状态
-    status = Status.query.filter_by(room_id=room_number_id).order_by(desc(Status.last_update)).first()
-
+    status = (
+        Status.query.filter_by(room_id=room_number_id)
+        .order_by(desc(Status.last_update))
+        .first()
+    )
 
     if not status:
         status = Status(

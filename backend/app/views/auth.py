@@ -34,7 +34,12 @@ def login():
         session.permanent = True  # 设置会话为永久有效
         csrf_token = generate_csrf_token()  # 生成 CSRF token
         session["csrf_token"] = csrf_token
-        return jsonify({"username": user.username, "role": user.role, "csrf_token": csrf_token}), 200
+        return (
+            jsonify(
+                {"username": user.username, "role": user.role, "csrf_token": csrf_token}
+            ),
+            200,
+        )
     else:
         return jsonify({"error": "Login failed"}), 401
 

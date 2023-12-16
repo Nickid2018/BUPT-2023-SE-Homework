@@ -6,7 +6,6 @@ import asyncio
 
 from app.models import Device, Status
 from sqlalchemy import desc
-from app.utils import generate_timestamp_id
 
 
 def scheduler_operation(room_number_id, operation):
@@ -19,11 +18,7 @@ def scheduler_operation(room_number_id, operation):
         .first()
     )
 
-    # 生成随机id
-    status_id = generate_timestamp_id()
-
     new_status = Status(
-        id=status_id,
         room_id=status.room_id,
         temperature=status.temperature,
         wind_speed=status.wind_speed,
@@ -125,8 +120,8 @@ class Scheduler:
 
         current_time = time.time()
         while (
-                self.service_queue
-                and (current_time - self.service_queue[0].last_scheduled_time) >= 20
+            self.service_queue
+            and (current_time - self.service_queue[0].last_scheduled_time) >= 20
         ):
             room = self.service_queue.popleft()
             room.last_scheduled_time = current_time

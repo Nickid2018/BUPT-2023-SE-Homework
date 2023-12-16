@@ -10,7 +10,9 @@ class Config:
 
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.abspath("data/Bupt.db")
-    SECRET_KEY = os.environ["SECRET_KEY"] if "SECRET_KEY" in os.environ else os.urandom(24)
+    SECRET_KEY = (
+        os.environ["SECRET_KEY"] if "SECRET_KEY" in os.environ else os.urandom(24)
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # # 配置服务器地址和端口
