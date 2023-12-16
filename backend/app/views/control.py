@@ -5,9 +5,8 @@ from app import db
 from app.models import Status, Device
 from datetime import datetime
 from sqlalchemy import desc
-from app.utils import generate_timestamp_id
+from app.utils import verify_signature
 from app.scheduler import scheduler, room_scheduler_map
-from app.scheduler import RoomScheduler
 
 control_blueprint = Blueprint("control", __name__)
 
@@ -15,15 +14,11 @@ def make_status(room_number_id, operation, value):
     selected_room = room_scheduler_map[room_number_id]
 
     # 查询对应房间状态
-    status = (
-        Status.query.filter_by(room_id=room_number_id)
-        .order_by(desc(Status.last_update))
-        .first()
-    )
+    status = Status.query.filter_by(room_id=room_number_id).order_by(desc(Status.last_update)).first()
+
 
     if not status:
         status = Status(
-            id=generate_timestamp_id(),
             room_id=room_number_id,
             temperature=25,
             wind_speed=2,
@@ -33,11 +28,7 @@ def make_status(room_number_id, operation, value):
             last_update=datetime.utcnow(),
         )
 
-    # 生成status_id
-    status_id = generate_timestamp_id()
-
     new_status = Status(
-        id=status_id,
         room_id=status.room_id,
         temperature=status.temperature,
         wind_speed=status.wind_speed,
@@ -97,8 +88,8 @@ def admin_control(room_id):
     return make_status(room.id, operation, value)
 
 
-@control_blueprint.route("/control", methods=["POST"])
-def server_control():
+@control_blueprint.route("/api/device/client/<room_id>", methods=["POST"])
+def server_control(room_id):
     """
     Server Operations for AC
     """
@@ -107,7 +98,19 @@ def server_control():
     # 进行签名验证，确保数据来自合法的客户端
 
     operation = data.get("operation")
-    room_id = data.get("room_id")
     value = data.get("data")  # 调节温度、风速、模式
+    time = data.get("time")
+    unique_id = data.get("unique_id")
+    signature = data.get("signature")
 
-    return make_status(room_id, operation, value)
+    room = Device.query.filter_by(room=room_id).first()
+    if not room:
+        return jsonify({"error": "Room not found"}), 404
+
+    public_key = room.public_key
+    # 验证签名
+    verify_str = str(operation) + str(unique_id) + str(value) + str(time)
+    if not verify_signature(verify_str, public_key, signature):
+        return jsonify({"error": "Signature verification failed"}), 403
+
+    return make_status(room.id, operation, value)

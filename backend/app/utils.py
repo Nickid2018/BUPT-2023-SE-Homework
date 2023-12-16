@@ -1,9 +1,7 @@
-from flask import request
+import base64
 
-import threading
-import time
-from queue import Queue
-import random
+import rsa
+from rsa import VerificationError
 
 
 # 需要修改
@@ -15,15 +13,10 @@ def check_csrf_token(requests):
     return 1
 
 
-def generate_timestamp_id():
-    # 获取当前时间戳
-    current_timestamp = int(time.time())
-
-    # 提取秒级别的时间戳，并转换为字符串
-    timestamp_str = str(current_timestamp)
-
-    # 取字符串的后8位，如果不足8位，在前面补0
-    id_str = timestamp_str[-8:].rjust(8, "0")
-
-    # 将字符串转换为整型
-    return int(id_str)
+def verify_signature(verify_str, public_key, signature):
+    public_key_parsed = rsa.PublicKey.load_pkcs1_openssl_pem(("-----BEGIN PUBLIC KEY-----\n" + public_key + "\n-----END PUBLIC KEY-----").encode())
+    try:
+        rsa.verify(verify_str.encode(), base64.urlsafe_b64decode(signature.encode()), public_key_parsed)
+        return True
+    except VerificationError:
+        return False

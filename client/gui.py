@@ -10,6 +10,13 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import pyqtSlot
 
 
+MODE_STR = [
+    "制冷",
+    "制热",
+    "送风"
+]
+
+
 class MainAppWindow(QMainWindow):
     def __init__(self, ac_controller):
         super().__init__()
@@ -84,35 +91,5 @@ class MainAppWindow(QMainWindow):
         )
         self.status_labels["sweep"].setText(f'扫风：{"开" if state["sweep"] else "关"}')
         self.status_labels["wind_speed"].setText(f'风速：{state["wind_speed"]}')
-        self.status_labels["mode"].setText(f'模式：{state["mode"]}')
+        self.status_labels["mode"].setText(f'模式：{MODE_STR[state["mode"]]}')
         self.status_labels["power"].setText(f'电源：{"开" if state["power"] else "关"}')
-
-    # @pyqtSlot()
-    # def toggle_power(self):
-    #     # 开关机逻辑
-    #     pass
-    #
-    # @pyqtSlot()
-    # def increase_temperature(self):
-    #     # 温度升高逻辑
-    #     pass
-    #
-    # @pyqtSlot()
-    # def decrease_temperature(self):
-    #     # 温度降低逻辑
-    #     pass
-    #
-    # @pyqtSlot()
-    # def change_wind_speed(self):
-    #     # 风速调节逻辑
-    #     pass
-    #
-    # @pyqtSlot()
-    # def toggle_sweep(self):
-    #     # 扫风切换逻辑
-    #     pass
-    #
-    # @pyqtSlot()
-    # def toggle_mode(self):
-    #     # 模式切换逻辑
-    #     pass

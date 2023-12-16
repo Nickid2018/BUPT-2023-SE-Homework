@@ -30,7 +30,7 @@ class User(db.Model):
 
 # 设备状态信息
 class Status(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     room_id = db.Column(db.Integer, db.ForeignKey("device.id"), nullable=False)  # 房间号
     temperature = db.Column(db.Integer, nullable=False)  # 温度
     wind_speed = db.Column(db.Integer, nullable=False)  # 风速

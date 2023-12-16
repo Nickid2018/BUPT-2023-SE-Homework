@@ -20,7 +20,7 @@ const emit = defineEmits<{
       </div>
       <div class="flex">
         <div>
-          <el-table :data="props.data" class="max-w-[33vw] py-4">
+          <el-table :data="props.data" max-height="50vh" class="max-w-[50vw] my-4">
             <el-table-column prop="start_time" label="开始时间" width="200"/>
             <el-table-column prop="end_time" label="结束时间" width="200"/>
             <el-table-column prop="temperature" label="温度" width="75"/>

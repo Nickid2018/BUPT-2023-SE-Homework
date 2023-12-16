@@ -10,6 +10,7 @@ const props = defineProps<{
 
 const selectedRoom = ref("");
 const checkedRooms = ref<string[]>([]);
+const checkoutResultData = ref<DeviceData[]>([]);
 
 function checkIn() {
   checkInRoom(props.loginCsrfToken, selectedRoom.value, () => {
@@ -20,43 +21,13 @@ function checkIn() {
   });
 }
 
-function fakeCheckOut(successCallback: (data: DeviceData[]) => void) {
-  successCallback([
-    {
-      start_time: "2021-07-01 00:00:00",
-      end_time: "2021-07-01 00:00:10",
-      temperature: 25,
-      wind_speed: 1,
-      mode: "cold",
-      sweep: false,
-      duration: 600,
-      cost: 114
-    },
-    {
-      start_time: "2021-07-01 00:00:10",
-      end_time: "2021-07-01 00:00:20",
-      temperature: 24,
-      wind_speed: 1,
-      mode: "cold",
-      sweep: true,
-      duration: 600,
-      cost: 514
-    }
-  ]);
-}
-
-const checkoutResultData = ref<DeviceData[]>([]);
-
 function checkOut() {
-  // checkOutRoom(props.loginCsrfToken, selectedRoom.value, () => {
-  //   checkedRooms.value = checkedRooms.value.filter(room => room !== selectedRoom.value);
-  // }, errorCode => {
-  //   console.log(errorCode);
-  // });
-  checkOutRoom;
-  fakeCheckOut(data => {
+  checkOutRoom(props.loginCsrfToken, selectedRoom.value, data => {
+    console.log(data)
+    checkoutResultData.value = data.report.details;
     checkedRooms.value = checkedRooms.value.filter(room => room !== selectedRoom.value);
-    checkoutResultData.value = data;
+  }, errorCode => {
+    console.log(errorCode);
   });
 }
 
