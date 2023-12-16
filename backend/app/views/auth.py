@@ -8,6 +8,7 @@ from app.scheduler import room_scheduler_map, RoomScheduler
 # 创建一个蓝图对象
 auth_blueprint = Blueprint("auth", __name__)
 
+
 @auth_blueprint.route("/api/login", methods=["POST"])
 def login():
     if len(room_scheduler_map) == 0:

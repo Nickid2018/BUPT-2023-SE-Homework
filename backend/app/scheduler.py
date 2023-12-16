@@ -4,7 +4,44 @@ from app import db
 import time
 import asyncio
 
-from app.models import Device
+from app.models import Device, Status
+from sqlalchemy import desc
+from app.utils import generate_timestamp_id
+
+
+def scheduler_operation(room_number_id, operation):
+    selected_room = room_scheduler_map[room_number_id]
+
+    # 查询最新状态
+    status = (
+        Status.query.filter_by(room_id=room_number_id)
+        .order_by(desc(Status.last_update))
+        .first()
+    )
+
+    # 生成随机id
+    status_id = generate_timestamp_id()
+
+    new_status = Status(
+        id=status_id,
+        room_id=status.room_id,
+        temperature=status.temperature,
+        wind_speed=status.wind_speed,
+        mode=status.mode,
+        sweep=status.sweep,
+        is_on=status.is_on,
+        last_update=datetime.utcnow(),
+    )
+
+    # 根据操作类型执行相应的操作
+    if operation == "start":
+        new_status.is_on = True
+    else:
+        new_status.is_on = False
+
+    # 提交到数据库
+    db.session.add(new_status)
+    db.session.commit()
 
 
 class RoomScheduler:
@@ -85,19 +122,38 @@ class Scheduler:
         )
 
         # 时间片调度
+
         current_time = time.time()
         while (
-            self.service_queue
-            and (current_time - self.service_queue[0].last_scheduled_time) >= 20
+                self.service_queue
+                and (current_time - self.service_queue[0].last_scheduled_time) >= 20
         ):
             room = self.service_queue.popleft()
             room.last_scheduled_time = current_time
+            room.is_on = False
+            room.update_temperature()
+            room.last_update_temperature = current_time
+
+            # 更新数据库记录
+            room_id = room.id
+            operation = "stop"
+            scheduler_operation(room_id, operation)
+
             self.waiting_queue.append(room)
 
         # 将等待队列的对象进行调度
         while self.waiting_queue and len(self.service_queue) < 3:
             room = self.waiting_queue.popleft()
             room.last_scheduled_time = current_time
+            room.is_on = True
+            room.update_temperature()
+            room.last_update_temperature = current_time
+
+            # 更新数据库记录
+            room_id = room.id
+            operation = "start"
+            scheduler_operation(room_id, operation)
+
             self.service_queue.append(room)
 
     def run_scheduler(self):

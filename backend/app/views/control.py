@@ -11,8 +11,10 @@ from app.scheduler import RoomScheduler
 
 control_blueprint = Blueprint("control", __name__)
 
+
 def make_status(room_number_id, operation, value):
-    selected_room = room_scheduler_map[room_number_id]
+    selected_room = room_scheduler_map[room_number_id]      # 这里可能有问题
+    selected_room = room_scheduler_map[room_number_id]      # 这里可能有问题
 
     # 查询对应房间状态
     status = (
@@ -83,6 +85,7 @@ def make_status(room_number_id, operation, value):
 
     # 操作成功，返回响应
     return jsonify({"message": "Operation successfully"}), 204
+
 
 @control_blueprint.route("/api/admin/device/<room_id>", methods=["POST"])
 def admin_control(room_id):
