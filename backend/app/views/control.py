@@ -8,6 +8,7 @@ from sqlalchemy import desc
 from app.utils import generate_timestamp_id
 from app.scheduler import room1, room2, room3, room4, room5
 from app.scheduler import scheduler
+from app.scheduler import RoomScheduler
 
 control_blueprint = Blueprint("control", __name__)
 

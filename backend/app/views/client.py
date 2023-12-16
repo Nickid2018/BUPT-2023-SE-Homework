@@ -8,6 +8,7 @@ from app import db
 from datetime import datetime
 from app.utils import generate_timestamp_id
 from app.scheduler import room1, room2, room3, room4, room5
+from app.scheduler import RoomScheduler
 
 client_blueprint = Blueprint("client", __name__)
 
@@ -33,6 +34,7 @@ def handle_client_online():
     # 更新调度计算使用的变量
     selected_room = rooms.get(room_id)
     selected_room.last_update_temperature = time.time()
+    # room1.last_update_temperature = time.time()
 
     # 根据时间生成一个8位的id
     status_id = generate_timestamp_id()

@@ -10,7 +10,7 @@ query_blueprint = Blueprint("query", __name__)
 
 
 # room字典
-rooms = {1: room1, 2: room2, 3: room3, 4: room4, 5: room5}
+rooms = {1: room1, 2: room2, 3: room3, 4: room4, 5: room5, 228: room1}
 
 
 # 获得某个房间的状态
