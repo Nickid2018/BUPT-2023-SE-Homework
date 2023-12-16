@@ -11,13 +11,7 @@ from app.scheduler import scheduler
 
 control_blueprint = Blueprint("control", __name__)
 
-rooms = {
-    1: room1,
-    2: room2,
-    3: room3,
-    4: room4,
-    5: room5
-}
+rooms = {1: room1, 2: room2, 3: room3, 4: room4, 5: room5}
 
 
 @control_blueprint.route("/control", methods=["POST"])

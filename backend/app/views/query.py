@@ -10,17 +10,11 @@ query_blueprint = Blueprint("query", __name__)
 
 
 # room字典
-rooms = {
-    1: room1,
-    2: room2,
-    3: room3,
-    4: room4,
-    5: room5
-}
+rooms = {1: room1, 2: room2, 3: room3, 4: room4, 5: room5}
 
 
 # 获得某个房间的状态
-@query_blueprint.route("/statue/<room_id>", methods=["GET"])
+@query_blueprint.route("/api/statue/<room_id>", methods=["GET"])
 def get_status(room_id):
     room = Room.query.filter_by(id=room_id).first()
     if room:
@@ -56,7 +50,7 @@ def get_status(room_id):
 
 
 # 获得全部房间的状态
-@query_blueprint.route("/status", methods=["GET"])
+@query_blueprint.route("/api/status", methods=["GET"])
 def get_all_status():
     all_room = Room.query.all()
     response_data = []

@@ -8,7 +8,7 @@ from app.utils import check_csrf_token
 room_blueprint = Blueprint("room", __name__)
 
 
-@room_blueprint.route("/room/check_in", methods=["POST"])
+@room_blueprint.route("/api/room/check_in", methods=["POST"])
 def check_in():
     # 检查用户是否已登录
     if "user_id" not in session:
@@ -32,7 +32,7 @@ def check_in():
         return jsonify({"error": "Room not found"}), 404
 
 
-@room_blueprint.route("/room/check_out", methods=["POST"])
+@room_blueprint.route("/api/room/check_out", methods=["POST"])
 def check_out():
     # 检查用户是否已登录
     if "user_id" not in session:
@@ -48,10 +48,14 @@ def check_out():
     # 根据实际情况处理房间退房逻辑
     room = Room.query.filter_by(id=room_number).first()
     if room:
-        # 更新房间状态等信息
-        # ...
+        # 更新房间状态等信息，删除这一阶段所有的记录
+        status_to_delete = Status.query.filter.by(room_id=room_number).all()
+        for status in status_to_delete:
+            db.session.delete(status)
 
-        # 生成报告数据
+        # 提交修改
+        db.session.commit()
+
         report_data = generate_report(room)
         return jsonify({"room": room.number, "report": report_data}), 200
     else:

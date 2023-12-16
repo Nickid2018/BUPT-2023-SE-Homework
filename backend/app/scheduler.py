@@ -26,14 +26,18 @@ class RoomScheduler:
             if self.mode == "cool":
                 if self.current_temperature >= self.target_temperature:
                     change_temperature = self.current_temperature - 0.5 * time_increment
-                    self.current_temperature = max(change_temperature, self.target_temperature)
+                    self.current_temperature = max(
+                        change_temperature, self.target_temperature
+                    )
                     self.last_update_temperature += time_increment * 10
                 else:
                     self.current_temperature = self.target_temperature
             else:
                 if self.current_temperature <= self.target_temperature:
                     change_temperature = self.current_temperature + 0.5 * time_increment
-                    self.current_temperature = min(change_temperature, self.target_temperature)
+                    self.current_temperature = min(
+                        change_temperature, self.target_temperature
+                    )
                     self.last_update_temperature += time_increment * 10
                 else:
                     self.current_temperature = self.target_temperature
@@ -41,7 +45,9 @@ class RoomScheduler:
             time_increment = int(time_elapsed / 10)  # 向下取整到最近的10秒的倍数
             if self.current_temperature <= self.initial_temperature:
                 change_temperature = self.current_temperature + 0.5 * time_increment
-                self.current_temperature = min(change_temperature, self.initial_temperature)
+                self.current_temperature = min(
+                    change_temperature, self.initial_temperature
+                )
                 self.last_update_temperature += time_increment * 10
 
 
@@ -78,7 +84,10 @@ class Scheduler:
 
         # 时间片调度
         current_time = time.time()
-        while self.service_queue and (current_time - self.service_queue[0].last_scheduled_time) >= 20:
+        while (
+            self.service_queue
+            and (current_time - self.service_queue[0].last_scheduled_time) >= 20
+        ):
             room = self.service_queue.popleft()
             room.last_scheduled_time = current_time
             self.waiting_queue.append(room)
