@@ -11,6 +11,8 @@ const props = defineProps<{
 const selectedRoom = ref("");
 const checkedRooms = ref<string[]>([]);
 const checkoutResultData = ref<DeviceData[]>([]);
+const totalCost = ref(0);
+const total_duration = ref(0);
 
 function checkIn() {
   checkInRoom(props.loginCsrfToken, selectedRoom.value, () => {
@@ -25,6 +27,8 @@ function checkOut() {
   checkOutRoom(props.loginCsrfToken, selectedRoom.value, data => {
     console.log(data)
     checkoutResultData.value = data.report.details;
+    totalCost.value = data.report.total_cost;
+    total_duration.value = data.report.total_time;
     checkedRooms.value = checkedRooms.value.filter(room => room !== selectedRoom.value);
   }, errorCode => {
     console.log(errorCode);
@@ -62,5 +66,6 @@ function checkOut() {
       </button>
     </div>
   </div>
-  <CheckoutResultData v-if="checkoutResultData.length > 0" :data="checkoutResultData" @close="checkoutResultData = []"/>
+  <CheckoutResultData v-if="checkoutResultData.length > 0" :data="checkoutResultData" :total_cost="totalCost"
+                      :total_duration="total_duration" @close="checkoutResultData = []"/>
 </template>

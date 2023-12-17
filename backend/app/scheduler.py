@@ -65,13 +65,11 @@ class RoomStatusEntry:
         )
         self.room_id = room_id
         self.temperature = temperature
-        self.initial_temperature = temperature
         self.wind_speed = wind_speed
         self.mode = mode
         self.sweep = sweep
         self.is_on = is_on
         self.last_update = last_update
-        self.last_temperature_update = last_update
         self.last_start = last_update
         self.ctx = None
 
@@ -92,7 +90,6 @@ class RoomStatusEntry:
 
     def set_temperature(self, temperature):
         self.temperature = temperature
-        self.put_status()
         client_control(self.room_id, self.public_key, "temperature", str(temperature))
 
     def set_wind_speed(self, wind_speed):
@@ -102,12 +99,10 @@ class RoomStatusEntry:
 
     def set_mode(self, mode):
         self.mode = mode
-        self.put_status()
         client_control(self.room_id, self.public_key, "mode", mode)
 
     def set_sweep(self, sweep):
         self.sweep = sweep
-        self.put_status()
         client_control(self.room_id, self.public_key, "sweep", str(sweep))
 
     def set_is_on(self, is_on):
@@ -257,19 +252,6 @@ class StatusScheduler:
         for room_status in to_add:
             room_status.set_is_on(True)
             room_status.updated()
-
-        # update temperature for not running rooms
-        for id in self.room_scheduler_map:
-            room_status = self.room_scheduler_map[id]
-            if (
-                room_status.last_temperature_update <= time.time() - TIME_SCHEDULE
-                and not room_status.is_on
-            ):
-                if room_status.temperature > room_status.initial_temperature:
-                    room_status.set_temperature(room_status.temperature - 1)
-                elif room_status.temperature < room_status.initial_temperature:
-                    room_status.set_temperature(room_status.temperature + 1)
-                room_status.updated_temperature()
 
         self.mutex.release()
 

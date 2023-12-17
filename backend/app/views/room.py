@@ -89,6 +89,8 @@ def check_out():
         for status in status_to_delete:
             db.session.delete(status)
 
+        room.total_income += math.ceil(total_cost * 100) / 100
+
         # 提交修改
         db.session.commit()
 

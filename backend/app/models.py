@@ -27,3 +27,4 @@ class Status(db.Model):
     sweep = db.Column(db.Boolean, nullable=False)  # 是否摆风
     is_on = db.Column(db.Boolean, nullable=False)  # 是否开机
     last_update = db.Column(db.DateTime, nullable=False)  # 状态改变时间
+
