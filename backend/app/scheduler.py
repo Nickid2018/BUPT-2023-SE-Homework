@@ -90,6 +90,7 @@ class RoomStatusEntry:
 
     def set_temperature(self, temperature):
         self.temperature = temperature
+        self.put_status()
         client_control(self.room_id, self.public_key, "temperature", str(temperature))
 
     def set_wind_speed(self, wind_speed):
@@ -99,10 +100,12 @@ class RoomStatusEntry:
 
     def set_mode(self, mode):
         self.mode = mode
+        self.put_status()
         client_control(self.room_id, self.public_key, "mode", mode)
 
     def set_sweep(self, sweep):
         self.sweep = sweep
+        self.put_status()
         client_control(self.room_id, self.public_key, "sweep", str(sweep))
 
     def set_is_on(self, is_on):
@@ -211,8 +214,8 @@ class StatusScheduler:
         for room_status in self.service_queue:
             if room_status.last_update <= time.time() - TIME_SCHEDULE:
                 self.service_queue.remove(room_status)
+                self.cooldown_queue.append(room_status)
                 room_status.updated()
-                heapq.heappush(self.cooldown_queue, room_status)
 
         # timeout waiting for RR
         cooldown_queue_copy = self.cooldown_queue.copy()
@@ -220,18 +223,19 @@ class StatusScheduler:
         for room_status in cooldown_queue_copy:
             if room_status.last_update <= time.time() - TIME_SCHEDULE:
                 self.cooldown_queue.remove(room_status)
-                heapq.heapify(self.cooldown_queue)
-                heapq.heappush(self.waiting_queue, room_status)
+                self.waiting_queue.append(room_status)
 
-        heapq.heapify(self.waiting_queue)
-        heapq.heapify(self.cooldown_queue)
+        self.waiting_queue.sort(key=lambda x: x.wind_speed, reverse=True)
+        self.cooldown_queue.sort(key=lambda x: x.wind_speed, reverse=True)
 
         # schedule
         while len(self.service_queue) < 3 and len(self.waiting_queue) > 0:
-            room_to_schedule = heapq.heappop(self.waiting_queue)
+            room_to_schedule = self.waiting_queue[0]
+            self.waiting_queue.remove(room_to_schedule)
             self.service_queue.append(room_to_schedule)
         while len(self.service_queue) < 3 and len(self.cooldown_queue) > 0:
-            room_to_schedule = heapq.heappop(self.cooldown_queue)
+            room_to_schedule = self.cooldown_queue[0]
+            self.cooldown_queue.remove(room_to_schedule)
             self.service_queue.append(room_to_schedule)
 
         # update status

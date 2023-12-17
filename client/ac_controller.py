@@ -119,8 +119,6 @@ class ACController(QObject):
         return self.target_state
 
     def commit(self):
-        if self.target_state["global_power"] != self.current_state["global_power"]:
-            self.send_update("start" if self.target_state["global_power"] else "stop", "")
         if self.target_state["set_temperature"] != self.current_state["set_temperature"]:
             self.send_update("temperature", str(self.target_state["set_temperature"]))
         if self.target_state["wind_speed"] != self.current_state["wind_speed"]:
@@ -129,6 +127,8 @@ class ACController(QObject):
             self.send_update("mode", MODE_SWITCH[self.target_state["mode"]])
         if self.target_state["sweep"] != self.current_state["sweep"]:
             self.send_update("sweep", str(self.target_state["sweep"]))
+        if self.target_state["global_power"] != self.current_state["global_power"]:
+            self.send_update("start" if self.target_state["global_power"] else "stop", "")
         self.current_state = self.target_state.copy()
         self.safe_update_callback()
 

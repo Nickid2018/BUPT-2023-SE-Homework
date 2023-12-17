@@ -15,6 +15,39 @@ const emit = defineEmits<{
 
 const showDetail = ref(false);
 
+
+function printDetails() {
+  // const items = billDetails;
+  const items = billDetails.value;
+  const header = [
+    'start_time',
+    'end_time',
+    'temperature',
+    'wind_speed',
+    'mode',
+    'sweep',
+    'duration',
+    'cost'
+  ];
+  const replacer = (_: any, value: any) => {
+    if (typeof value === 'boolean') {
+      return value ? 'Yes' : 'No';
+    }
+    return value === null ? '' : value;
+  };
+  const csv = [
+    header.join(','),
+    ...items.map((row: any) => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
+  ].join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const link = document.createElement('a');
+  link.href = window.URL.createObjectURL(blob);
+  link.download = 'bill_details.csv';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 </script>
 
 <template>
@@ -44,6 +77,9 @@ const showDetail = ref(false);
       <div class="flex gap-10 mt-6">
         <button class="rounded-md px-4 py-2 bg-primary-100 " @click="showDetail = !showDetail">
           {{showDetail ? '隐藏' : '显示'}}详单
+        </button>
+        <button class="rounded-md px-4 py-2 bg-primary-100 " v-if="showDetail" @click="printDetails">
+          导出详单
         </button>
         <button class="rounded-md px-4 py-2 bg-primary-100 " @click="emit('close')">
           退房完成
