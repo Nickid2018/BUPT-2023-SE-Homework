@@ -7,6 +7,7 @@ class Device(db.Model):
     id = db.Column(db.Integer, primary_key=True)  # 将id定义为主键
     room = db.Column(db.String(255), unique=True, nullable=False)  # room为候选键，不为空
     public_key = db.Column(db.String(4096), nullable=False)
+    total_income = db.Column(db.Float, nullable=False, default=0)
 
 
 # 储存用户信息

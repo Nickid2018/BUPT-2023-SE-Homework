@@ -6,7 +6,14 @@ import socket
 import rsa
 
 import constants
-from ac_controller import MODE_SWITCH
+
+MODE_SWITCH = [
+    "cool",
+    "hot",
+    "wind"
+]
+
+ac_controller_map = {}
 
 
 class WebHookHandler(BaseHTTPRequestHandler):
@@ -23,21 +30,27 @@ class WebHookHandler(BaseHTTPRequestHandler):
         post_data = json.loads(rsa.decrypt(base64.urlsafe_b64decode(post_data), constants.private_key).decode())
 
         print(post_data)
+        print(ac_controller_map)
+        ac_controller = ac_controller_map[self.server.server_address[1]]
 
         operation = post_data['operation']
         if operation == 'start':
-            constants.ac_controller.get_current_state()['power'] = True
+            ac_controller.power = True
         if operation == 'stop':
-            constants.ac_controller.get_current_state()['power'] = False
+            ac_controller.power = False
         if operation == 'temperature':
-            constants.ac_controller.get_current_state()['set_temperature'] = int(post_data['data'])
+            ac_controller.get_current_state()['set_temperature'] = int(post_data['data'])
+            ac_controller.get_target_state()['set_temperature'] = int(post_data['data'])
         if operation == 'wind_speed':
-            constants.ac_controller.get_current_state()['wind_speed'] = int(post_data['data'])
+            ac_controller.get_current_state()['wind_speed'] = int(post_data['data'])
+            ac_controller.get_target_state()['wind_speed'] = int(post_data['data'])
         if operation == 'mode':
-            constants.ac_controller.get_current_state()['mode'] = MODE_SWITCH.index(post_data['data'])
+            ac_controller.get_current_state()['mode'] = MODE_SWITCH.index(post_data['data'])
+            ac_controller.get_target_state()['mode'] = MODE_SWITCH.index(post_data['data'])
         if operation == 'sweep':
-            constants.ac_controller.get_current_state()['sweep'] = post_data['data'] == 'True'
-        constants.ac_controller.safe_update_callback()
+            ac_controller.get_current_state()['sweep'] = post_data['data'] == 'True'
+            ac_controller.get_target_state()['sweep'] = post_data['data'] == 'True'
+        ac_controller.safe_update_callback()
 
         data_ret = str(json.dumps(post_data) + "\n").encode()
         content_length = len(data_ret)

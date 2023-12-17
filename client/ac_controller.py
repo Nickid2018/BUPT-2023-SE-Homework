@@ -13,34 +13,20 @@ MODE_SWITCH = [
 ]
 
 
-def send_update(operation, data):
-    # 构建请求数据
-    request_data = {
-        "operation": operation,
-        "data": data,
-        "time": time.strftime("%Y-%m-%dT%H:%M:%S+08:00"),
-        "unique_id": generate_unique_id(),
-        "signature": None
-    }
-
-    sign_text = request_data["operation"] + request_data["unique_id"] + request_data["data"] + request_data["time"]
-    request_data["signature"] = sign(sign_text)
-
-    send_request(f'{constants.server_url}/device/client/{constants.room_id}', request_data)
-
-
 class ACController(QObject):
-    def __init__(self):
+    def __init__(self, room_id):
         super().__init__()
+        self.room_id = room_id
+
         self.initial_temperature = 26
         self.now_temperature = 26
         self.update_callback = None
         self.current_state = {
-            'room_id': sys.argv[1],
+            'room_id': room_id,
             'global_power': False,  # 初始状态为关
             'set_temperature': 26,  # 用户设定的初始温度
             'mode': 0,  # 初始模式
-            'wind_speed': 1,  # 初始风速
+            'wind_speed': 2,  # 初始风速
             'sweep': False  # 初始扫风状态
         }
         self.target_state = self.current_state.copy()
@@ -50,9 +36,25 @@ class ACController(QObject):
         self.timer.timeout.connect(self.update_temperature)
         self.timer.start(10000)
 
+    def set_network_manager(self, network_manager):
+        self.network_manager = network_manager
+
+    def send_update(self, operation, data):
+        # 构建请求数据
+        request_data = {
+            "operation": operation,
+            "data": data,
+            "time": time.strftime("%Y-%m-%dT%H:%M:%S+08:00"),
+            "unique_id": generate_unique_id(),
+            "signature": None
+        }
+
+        sign_text = request_data["operation"] + request_data["unique_id"] + request_data["data"] + request_data["time"]
+        request_data["signature"] = sign(sign_text)
+
+        send_request(f'{self.network_manager.server_url}/device/client/{self.room_id}', request_data)
+
     def update_temperature(self):
-        if self.current_state["set_temperature"] == self.now_temperature:
-            return
         if self.power:
             if self.current_state["set_temperature"] > self.now_temperature:
                 self.now_temperature += 0.5
@@ -63,15 +65,20 @@ class ACController(QObject):
                 self.now_temperature -= 0.5
             elif self.now_temperature < self.initial_temperature:
                 self.now_temperature += 0.5
-        if self.current_state["set_temperature"] == self.now_temperature:
-            send_update("stop", "")
-        elif self.current_state["global_power"]:
-            send_update("start", "")
+        if self.current_state["global_power"]:
+            if self.current_state["set_temperature"] == self.now_temperature:
+                self.send_update("stop", "")
+            else:
+                self.send_update("start", "")
         self.safe_update_callback()
 
 
     def toggle_power(self):
         self.target_state["global_power"] = not self.target_state["global_power"]
+        self.safe_update_callback()
+
+    def set_temperature(self, temperature):
+        self.target_state["set_temperature"] = temperature
         self.safe_update_callback()
 
     def increase_temperature(self):
@@ -113,15 +120,15 @@ class ACController(QObject):
 
     def commit(self):
         if self.target_state["global_power"] != self.current_state["global_power"]:
-            send_update("start" if self.target_state["global_power"] else "stop", "")
+            self.send_update("start" if self.target_state["global_power"] else "stop", "")
         if self.target_state["set_temperature"] != self.current_state["set_temperature"]:
-            send_update("temperature", str(self.target_state["set_temperature"]))
+            self.send_update("temperature", str(self.target_state["set_temperature"]))
         if self.target_state["wind_speed"] != self.current_state["wind_speed"]:
-            send_update("wind_speed", str(self.target_state["wind_speed"]))
+            self.send_update("wind_speed", str(self.target_state["wind_speed"]))
         if self.target_state["mode"] != self.current_state["mode"]:
-            send_update("mode", MODE_SWITCH[self.target_state["mode"]])
+            self.send_update("mode", MODE_SWITCH[self.target_state["mode"]])
         if self.target_state["sweep"] != self.current_state["sweep"]:
-            send_update("sweep", str(self.target_state["sweep"]))
+            self.send_update("sweep", str(self.target_state["sweep"]))
         self.current_state = self.target_state.copy()
         self.safe_update_callback()
 

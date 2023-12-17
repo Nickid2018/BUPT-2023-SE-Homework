@@ -27,7 +27,7 @@ class MainAppWindow(QMainWindow):
 
     def initUI(self):
         # 设置窗口标题和大小
-        self.setWindowTitle(f"酒店空调控制系统 {constants.room_id}")
+        self.setWindowTitle(f"酒店空调控制系统 {self.ac_controller.room_id}")
         self.setGeometry(300, 300, 500, 400)
 
         # 创建布局和中心小部件
