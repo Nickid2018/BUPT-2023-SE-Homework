@@ -74,12 +74,18 @@ export function checkInRoom(csrfToken: string, room: string, successCallback: (d
 }
 
 export function checkOutRoom(csrfToken: string, room: string,
-                             successCallback: (data: { room: string, report: {total_cost: number, total_duration: number, details: DeviceData[] }}) => void,
+                             successCallback: (data: {
+                               room: string,
+                               report: { total_cost: number, total_duration: number, details: DeviceData[] }
+                             }) => void,
                              errorCallback: (errorCode: number) => void) {
   createWithCSRFToken(protocol.post, "/room/check_out", csrfToken, {
     room: room
   }).then(
-    (data) => successCallback(data as unknown as { room: string, report: {total_cost: number, total_duration: number, details: DeviceData[] }}),
+    (data) => successCallback(data as unknown as {
+      room: string,
+      report: { total_cost: number, total_duration: number, details: DeviceData[] }
+    }),
     (errorCode) => errorCallback(errorCode)
   );
 }

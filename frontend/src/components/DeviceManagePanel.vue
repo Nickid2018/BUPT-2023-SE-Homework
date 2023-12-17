@@ -62,11 +62,12 @@ function confirmCancelDevice(roomValue: string) {
     <button @click="openAddDevice" class="bg-blue-300 hover:bg-blue-400 text-white font-bold py-2 px-12 rounded mt-4">
       添加设备
     </button>
-    <button @click="openCancelDevice" class="bg-red-300 hover:bg-red-400 text-white font-bold py-2 px-12 rounded mt-4 ml-24">
+    <button @click="openCancelDevice"
+            class="bg-red-300 hover:bg-red-400 text-white font-bold py-2 px-12 rounded mt-4 ml-24">
       取消设备
     </button>
   </div>
-  <AddDevice v-if="isAddDeviceOpen" @close-modal="closeAddDevice" @confirm="confirmAddDevice" />
+  <AddDevice v-if="isAddDeviceOpen" @close-modal="closeAddDevice" @confirm="confirmAddDevice"/>
   <CancelDevice v-if="isCancelDeviceOpen" @close-modal="closeCancelDevice" @confirm-cancel="confirmCancelDevice"/>
-                    
+
 </template>

@@ -120,6 +120,7 @@ function toggleSweep() {
   targetSweep.value = !selectRoomData.value.sweep;
   control("sweep", targetSweep.value);
 }
+
 // -----------------
 
 // ---- Interval ----
@@ -173,8 +174,7 @@ function selectRoom(room: string) {
             {{ selectRoomData.is_on ? "工作中" : "未开启" }}
           </div>
         </div>
-        <div class="flex-1">
-        </div>
+        <div class="flex-1"/>
       </div>
       <div class="flex">
         <div class="flex-1 flex flex-col justify-center">

@@ -1,11 +1,13 @@
 # 项目介绍
-  
+
 # 环境依赖
+
     flask == 3.0.0
     Python >= 3.8
     Werkzeug >= 3.0.0   
 
 # 目录结构介绍
+
 ```
 backend/
 |-- app/
@@ -32,9 +34,8 @@ backend/
 |-- README.MD        
 ```
 
-**调度基本完成，部分函数需要修改**
-
 # 使用
+
 ```
 flask run --host=0.0.0.0 --port=11451 --debug   # 运行项目
 
@@ -44,7 +45,3 @@ flask db init
 flask db migrate -m "Initial migration"
 flask db upgrade
 ```
-
-### 问题
-1. 不知道为什么在client.py和control.py中的字典不起作用，已解决
-2. 在调度更新的时候缺少记录更新，未解决

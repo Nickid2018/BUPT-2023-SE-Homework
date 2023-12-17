@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, defineEmits } from 'vue';
+import {ref, defineEmits} from 'vue';
+import InputField from "./InputField.vue";
 
 defineProps<{
   roomPlaceholder?: string;
@@ -27,54 +28,29 @@ const closeModal = () => {
 
 <template>
   <div class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-    <div class="bg-white p-8 rounded-md">
-      <h2 class="text-2xl font-bold mb-8">取消设备</h2>
+    <div class="bg-white rounded-md w-fit h-fit px-10 py-5 flex flex-col items-center">
+      <h2 class="flex-none text-2xl font-bold mb-8">删除设备</h2>
 
       <!-- Room Input -->
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700">房间号</label>
-        <div
-          class="inline-flex items-center justify-center cursor-text px-[11px] py-[1px] rounded-md border-2 border-gray-300"
-          :class="{'border-primary-500': roomInputFocused}"
-        >
-          <input
-            v-model="roomValue"
-            @focus="roomInputFocused = true"
-            @blur="roomInputFocused = false"
-            class="outline-none border-none p-0 bg-none w-full flex-grow"
-            type="text"
-            :placeholder="roomPlaceholder || '请输入房间号'"
-          />
+      <div class="flex-none mb-4">
+        <div>
+          <label class="mr-3">房间号</label>
+          <InputField font-size="1em" line-height="2em" :error="false" id="roomValue"
+                      @value-change="value => roomValue = value"/>
         </div>
       </div>
 
-      <!-- Key Input -->
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700">Key</label>
-        <div
-          class="inline-flex items-center justify-center cursor-text px-[11px] py-[1px] rounded-md border-2 border-gray-300"
-          :class="{'border-primary-500': keyInputFocused}"
-        >
-          <input
-            v-model="keyInputValue"
-            @focus="keyInputFocused = true"
-            @blur="keyInputFocused = false"
-            class="outline-none border-none p-0 bg-none w-full flex-grow"
-            type="text"
-            :placeholder="keyPlaceholder || '请输入Key'"
-          />
-        </div>
-      </div>
-
-      <div class="flex justify-center mt-8 mb-2">
+      <div class="flex-none flex items-center gap-10 mt-2 px-10 py-2 w-full">
         <!-- Confirm Cancel Button -->
-        <button @click="confirmCancel" class="bg-red-300 hover:bg-red-400 text-white font-bold py-2 px-6 rounded">
-            确认
+        <button @click="confirmCancel"
+                class="bg-red-300 hover:bg-red-400 text-white font-bold py-2 px-6 rounded flex-1">
+          确认
         </button>
 
         <!-- Close Button -->
-        <button @click="closeModal" class="bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-2 px-6 rounded ml-4">
-            关闭
+        <button @click="closeModal"
+                class="bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-2 px-6 rounded ml-4 flex-1">
+          关闭
         </button>
       </div>
     </div>

@@ -63,13 +63,6 @@ function logoutNow() {
   })
 }
 
-// test code ----
-// loginState.value = true;
-// loginName.value = "test";
-// loginCsrfToken.value = "test";
-// role.value = "checkout";
-// --------------
-
 </script>
 
 <template>
@@ -98,7 +91,7 @@ function logoutNow() {
         <span class="cursor-pointer transition-all duration-150">{{ panel }}</span>
       </div>
     </div>
-    <div class="flex-none mx-10 my-5">
+    <div class="flex-none mx-10 my-5 cursor-pointer">
       <div v-if="loginState" @click="logoutNow">
         {{ loginName }}
       </div>

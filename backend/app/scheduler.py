@@ -14,14 +14,24 @@ from app.models import Status
 
 client_remote_map = {}
 
+
 def client_control(room_id, public_key, operation, value):
     response = requests.post(
         client_remote_map[room_id],
         base64.urlsafe_b64encode(
-            rsa.encrypt(json.dumps({"operation": operation, "data": value}).encode(), public_key)
+            rsa.encrypt(
+                json.dumps({"operation": operation, "data": value}).encode(), public_key
+            )
         ).decode(),
     )
-    print("Send control to ", client_remote_map[room_id], " with operation ", operation, " and value ", value)
+    print(
+        "Send control to ",
+        client_remote_map[room_id],
+        " with operation ",
+        operation,
+        " and value ",
+        value,
+    )
     if response.status_code == 204:
         return True
     else:
@@ -44,7 +54,13 @@ class RoomStatusEntry:
         is_on,
         last_update,
     ):
-        self.public_key = rsa.PublicKey.load_pkcs1_openssl_pem(('-----BEGIN PUBLIC KEY-----\n' + public_key + '\n-----END PUBLIC KEY-----').encode())
+        self.public_key = rsa.PublicKey.load_pkcs1_openssl_pem(
+            (
+                "-----BEGIN PUBLIC KEY-----\n"
+                + public_key
+                + "\n-----END PUBLIC KEY-----"
+            ).encode()
+        )
         self.room_id = room_id
         self.temperature = temperature
         self.initial_temperature = temperature
@@ -105,8 +121,6 @@ class RoomStatusEntry:
         return self.wind_speed < other.wind_speed
 
 
-
-
 class StatusScheduler:
     def __init__(self):
         self.ctx = None
@@ -120,7 +134,9 @@ class StatusScheduler:
     def room_online(self, room_id, public_key):
         self.mutex.acquire()
         if room_id not in self.room_scheduler_map:
-            self.room_scheduler_map[room_id] = make_simple_room_status(room_id, public_key)
+            self.room_scheduler_map[room_id] = make_simple_room_status(
+                room_id, public_key
+            )
             self.room_scheduler_map[room_id].ctx = self.ctx
         self.mutex.release()
 

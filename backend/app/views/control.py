@@ -5,6 +5,7 @@ from app.scheduler import scheduler
 
 control_blueprint = Blueprint("control", __name__)
 
+
 def make_status(room_number_id, operation, value):
     if operation == "start":
         scheduler.add_room_in_queue(room_number_id)
@@ -20,6 +21,7 @@ def make_status(room_number_id, operation, value):
         scheduler.update_sweep(room_number_id, value == "True")
 
     return jsonify({"message": "Operation successfully"}), 204
+
 
 @control_blueprint.route("/api/admin/device/<room_id>", methods=["POST"])
 def admin_control(room_id):
