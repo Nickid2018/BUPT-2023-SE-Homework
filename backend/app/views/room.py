@@ -125,4 +125,4 @@ def calculate_cost(speed, delta_time):
     # 计算电费
     electricity_cost = energy_consumed * cost_rate
 
-    return electricity_cost
+    return electricity_cost * 6

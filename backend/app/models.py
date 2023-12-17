@@ -3,21 +3,10 @@ from datetime import datetime
 
 
 # 每个 class 代表一张表
-# 设备信息，有点问题
 class Device(db.Model):
     id = db.Column(db.Integer, primary_key=True)  # 将id定义为主键
     room = db.Column(db.String(255), unique=True, nullable=False)  # room为候选键，不为空
-    public_key = db.Column(db.String(4096), nullable=False)  #
-
-
-# # 暂且用来记录空调状态的改变
-# class Record(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)  #
-#     room = db.Column(db.String(255), nullable=False)
-#     operation = db.Column(db.String(255), nullable=False)
-#     time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-#     unique_id = db.Column(db.String(16), nullable=False, unique=True)
-#     signature = db.Column(db.String(255), nullable=False)  # 数字签名
+    public_key = db.Column(db.String(4096), nullable=False)
 
 
 # 储存用户信息

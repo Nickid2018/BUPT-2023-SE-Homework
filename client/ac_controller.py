@@ -1,5 +1,6 @@
 import sys
 import time
+
 from PyQt5.QtCore import QObject
 
 import constants
@@ -59,7 +60,7 @@ class ACController(QObject):
         self.safe_update_callback()
 
     def change_wind_speed(self):
-        send_update("wind_speed", str((self.current_state["wind_speed"] - 1) % 3 + 1))
+        send_update("wind_speed", str(self.current_state["wind_speed"] % 3 + 1))
         self.safe_update_callback()
 
     def toggle_sweep(self):

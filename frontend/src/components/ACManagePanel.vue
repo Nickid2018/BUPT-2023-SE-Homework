@@ -129,7 +129,7 @@ let intervalId = 0;
 onMounted(() => intervalId = setInterval(() => {
   if (selectedRoom.value !== "")
     updateSelectRoomDataAndThen(selectedRoom.value);
-}, 5000));
+}, 1000));
 
 onUnmounted(() => clearInterval(intervalId));
 

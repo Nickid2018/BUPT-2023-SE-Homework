@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import pyqtSlot
 
+import constants
 
 MODE_STR = [
     "制冷",
@@ -26,7 +27,7 @@ class MainAppWindow(QMainWindow):
 
     def initUI(self):
         # 设置窗口标题和大小
-        self.setWindowTitle("酒店空调控制系统")
+        self.setWindowTitle(f"酒店空调控制系统 {constants.room_id}")
         self.setGeometry(300, 300, 400, 400)
 
         # 创建布局和中心小部件
@@ -45,6 +46,7 @@ class MainAppWindow(QMainWindow):
             "wind_speed": QLabel("风速："),
             "mode": QLabel("模式："),
             "power": QLabel("电源："),
+            "cost": QLabel("当前费用："),
         }
         for label in self.status_labels.values():
             self.status_layout.addWidget(label)
@@ -89,3 +91,23 @@ class MainAppWindow(QMainWindow):
         self.status_labels["wind_speed"].setText(f'风速：{state["wind_speed"]}')
         self.status_labels["mode"].setText(f'模式：{MODE_STR[state["mode"]]}')
         self.status_labels["power"].setText(f'电源：{"开" if state["power"] else "关"}')
+        self.status_labels["cost"].setText(f'当前费用：{calculate_cost(state["wind_speed"]) if state["power"] else 0:.2f} 元/分')
+
+
+def calculate_cost(speed):
+    # 设置费率
+    cost_rate = 0.5
+
+    # 设置不同风速下每度电的运行时间
+    speed_to_minutes = {1: 3, 2: 2, 3: 1}
+
+    # 风速对应的每度电运行时间
+    speed_minutes = speed_to_minutes.get(speed, 1)
+
+    # 计算用电量
+    energy_consumed = 1 / speed_minutes
+
+    # 计算电费
+    electricity_cost = energy_consumed * cost_rate
+
+    return electricity_cost

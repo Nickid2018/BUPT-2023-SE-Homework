@@ -14,6 +14,8 @@ from app.models import Status
 
 client_remote_map = {}
 
+TIME_SCHEDULE = 20
+
 
 def client_control(room_id, public_key, operation, value):
     response = requests.post(
@@ -69,6 +71,8 @@ class RoomStatusEntry:
         self.sweep = sweep
         self.is_on = is_on
         self.last_update = last_update
+        self.last_temperature_update = last_update
+        self.last_start = last_update
         self.ctx = None
 
     def put_status(self):
@@ -108,11 +112,16 @@ class RoomStatusEntry:
 
     def set_is_on(self, is_on):
         self.is_on = is_on
+        if is_on:
+            self.last_start = time.time()
         self.put_status()
         client_control(self.room_id, self.public_key, "start" if is_on else "stop", "")
 
     def updated(self):
         self.last_update = time.time()
+
+    def updated_temperature(self):
+        self.last_temperature_update = time.time()
 
     def __gt__(self, other):
         return self.wind_speed > other.wind_speed
@@ -142,21 +151,29 @@ class StatusScheduler:
 
     def add_room_in_queue(self, room_id):
         self.mutex.acquire()
-        heapq.heappush(self.waiting_queue, room_id)
-        self.room_scheduler_map[room_id].updated()
+        room_status = self.room_scheduler_map[room_id]
+        if (
+            room_status not in self.service_queue
+            and room_status not in self.waiting_queue
+            and room_status not in self.cooldown_queue
+        ):
+            heapq.heappush(self.waiting_queue, room_status)
+            room_status.set_is_on(False)
+            room_status.updated()
         self.mutex.release()
 
     def update_wind_speed(self, room_id, wind_speed):
         self.mutex.acquire()
-        self.room_scheduler_map[room_id].set_wind_speed(wind_speed)
-        if room_id in self.waiting_queue:
-            self.waiting_queue.remove(room_id)
+        room_status = self.room_scheduler_map[room_id]
+        room_status.set_wind_speed(wind_speed)
+        if room_status in self.waiting_queue:
+            self.waiting_queue.remove(room_status)
             heapq.heapify(self.waiting_queue)
-            heapq.heappush(self.waiting_queue, room_id)
-        if room_id in self.cooldown_queue:
-            self.cooldown_queue.remove(room_id)
+            heapq.heappush(self.waiting_queue, room_status)
+        if room_status in self.cooldown_queue:
+            self.cooldown_queue.remove(room_status)
             heapq.heapify(self.cooldown_queue)
-            heapq.heappush(self.cooldown_queue, room_id)
+            heapq.heappush(self.cooldown_queue, room_status)
         self.mutex.release()
 
     def update_temperature(self, room_id, temperature):
@@ -176,38 +193,43 @@ class StatusScheduler:
 
     def remove_room_from_queue(self, room_id):
         self.mutex.acquire()
-        if room_id in self.service_queue:
-            self.service_queue.remove(room_id)
-        if room_id in self.waiting_queue:
-            self.waiting_queue.remove(room_id)
+        room_status = self.room_scheduler_map[room_id]
+        if room_status in self.service_queue:
+            self.service_queue.remove(room_status)
+        if room_status in self.waiting_queue:
+            self.waiting_queue.remove(room_status)
             heapq.heapify(self.waiting_queue)
-        if room_id in self.cooldown_queue:
-            self.cooldown_queue.remove(room_id)
+        if room_status in self.cooldown_queue:
+            self.cooldown_queue.remove(room_status)
             heapq.heapify(self.cooldown_queue)
-        self.room_scheduler_map[room_id].set_is_on(False)
+        room_status.set_is_on(False)
         self.mutex.release()
 
     def schedule(self):
         self.mutex.acquire()
 
+        # initialize
+        self.service_queue.sort(key=lambda x: x.last_start)
         service_queue_copy = self.service_queue.copy()
 
         # timeout cooldown for RR
-        for room_id in self.service_queue:
-            room_status = self.room_scheduler_map[room_id]
-            if room_status.last_update > time.time() - 120:
-                self.service_queue.remove(room_id)
-                heapq.heappush(self.cooldown_queue, room_id)
+        for room_status in self.service_queue:
+            if room_status.last_update <= time.time() - TIME_SCHEDULE:
+                self.service_queue.remove(room_status)
+                room_status.updated()
+                heapq.heappush(self.cooldown_queue, room_status)
 
         # timeout waiting for RR
         cooldown_queue_copy = self.cooldown_queue.copy()
-        cooldown_queue_copy.sort(key=lambda x: self.room_scheduler_map[x].last_update)
-        for room_id in cooldown_queue_copy:
-            room_status = self.room_scheduler_map[room_id]
-            if room_status.last_update > time.time() - 120:
-                self.cooldown_queue.remove(room_id)
+        cooldown_queue_copy.sort(key=lambda x: x.last_update)
+        for room_status in cooldown_queue_copy:
+            if room_status.last_update <= time.time() - TIME_SCHEDULE:
+                self.cooldown_queue.remove(room_status)
                 heapq.heapify(self.cooldown_queue)
-                heapq.heappush(self.waiting_queue, room_id)
+                heapq.heappush(self.waiting_queue, room_status)
+
+        heapq.heapify(self.waiting_queue)
+        heapq.heapify(self.cooldown_queue)
 
         # schedule
         while len(self.service_queue) < 3 and len(self.waiting_queue) > 0:
@@ -222,36 +244,47 @@ class StatusScheduler:
         to_add = []
 
         service_queue_scheduled_copy = self.service_queue.copy()
-        for room_id in service_queue_scheduled_copy:
-            if room_id not in service_queue_copy:
-                to_add.append(room_id)
-        for room_id in service_queue_copy:
-            if room_id not in service_queue_scheduled_copy:
-                to_remove.append(room_id)
+        for room_status in service_queue_scheduled_copy:
+            if room_status not in service_queue_copy:
+                to_add.append(room_status)
+        for room_status in service_queue_copy:
+            if room_status not in service_queue_scheduled_copy:
+                to_remove.append(room_status)
 
-        for room_id in to_remove:
-            self.room_scheduler_map[room_id].set_is_on(False)
-            self.room_scheduler_map[room_id].updated()
-        for room_id in to_add:
-            self.room_scheduler_map[room_id].set_is_on(True)
-            self.room_scheduler_map[room_id].updated()
+        for room_status in to_remove:
+            room_status.set_is_on(False)
+            room_status.updated()
+        for room_status in to_add:
+            room_status.set_is_on(True)
+            room_status.updated()
 
         # update temperature for not running rooms
-        for room_id in self.room_scheduler_map:
-            room_status = self.room_scheduler_map[room_id]
-            if room_status.last_update < time.time() - 120 and not room_status.is_on:
+        for id in self.room_scheduler_map:
+            room_status = self.room_scheduler_map[id]
+            if (
+                room_status.last_temperature_update <= time.time() - TIME_SCHEDULE
+                and not room_status.is_on
+            ):
                 if room_status.temperature > room_status.initial_temperature:
                     room_status.set_temperature(room_status.temperature - 1)
                 elif room_status.temperature < room_status.initial_temperature:
                     room_status.set_temperature(room_status.temperature + 1)
-                room_status.updated()
+                room_status.updated_temperature()
 
         self.mutex.release()
 
     def run_scheduler_thread(self):
         while True:
             self.schedule()
-            time.sleep(10)
+            print(
+                "Current service queue: ",
+                [i.room_id for i in self.service_queue],
+                " Waiting queue: ",
+                [i.room_id for i in self.waiting_queue],
+                " Cooldown queue: ",
+                [i.room_id for i in self.cooldown_queue],
+            )
+            time.sleep(1)
 
     def run_scheduler(self, ctx):
         self.ctx = ctx
